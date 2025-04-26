@@ -14,5 +14,18 @@ void logging_event(const char *event, const char *user)
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
 
-    
+    fprintf(fp, "%04d-%02d-%02d %02d:%02d:%02d | %s | %s\n",
+        t->tm_year + 1900,
+        t->tm_mon + 1,
+        t->tm_mday,
+        t->tm_hour,
+        t->tm_min,
+        t->tm_sec,
+        event,
+        user
+    );
+
+    fclose(fp);
 }
+// command use for admin logging_event(event,admin);
+// command use for other user logging_event(event,other user);
