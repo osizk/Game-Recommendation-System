@@ -29,3 +29,24 @@ void logging_event(const char *event, const char *user)
 }
 // command use for admin logging_event(event,admin);
 // command use for other user logging_event(event,other user);
+
+
+void display_logging()
+{
+    FILE *fp = fopen("lpgging.txt","a");
+    if(fp == NULL)
+    {
+        printf("Can't open logging.txt\n");
+        return;
+    }
+
+    char line[512];
+    printf("----SystemLoggingHead----");
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
+        printf("%s", line);
+    }
+    printf("----SystemLoggingBottom----");
+
+    fclose(fp);
+}
