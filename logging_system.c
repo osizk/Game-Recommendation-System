@@ -10,5 +10,9 @@ void logging_event(const char *event, const char *user)
         printf("Can't open logging.txt\n");
         return;
     }
+
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+
     
 }
