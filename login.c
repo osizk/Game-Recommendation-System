@@ -1,6 +1,7 @@
 #include "login.h"
 #include <stdio.h>
 #include <string.h>
+#include "logging_system.h"
 
 int user_login()
 {
@@ -28,6 +29,11 @@ int user_login()
         if (sscanf(line, "%[^,],%s", file_user, file_pass) == 2) {
             if (strcmp(input_user, file_user) == 0 && strcmp(input_pass, file_pass) == 0) {
                 check = 1;
+
+                //Logging User login
+                char event[100];
+                snprintf(event, sizeof(event), "User %s login ", input_user);
+                log_event(event, input_user);
                 break;
             }
         }
@@ -64,6 +70,11 @@ int admin_login()
         if (sscanf(line, "%[^,],%s", file_user, file_pass) == 2) {
             if (strcmp(input_user, file_user) == 0 && strcmp(input_pass, file_pass) == 0) {
                 check = 1;
+
+                //Logging Admin login
+                char event[100];
+                snprintf(event, sizeof(event), "Admin %s login ", input_user);
+                log_event(event, input_user);
                 break;
             }
         }
