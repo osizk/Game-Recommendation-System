@@ -33,7 +33,7 @@ int user_login()
                 //Logging User login
                 char event[100];
                 snprintf(event, sizeof(event), "User %s login ", input_user);
-                log_event(event, input_user);
+                logging_event(event, input_user);
                 break;
             }
         }
@@ -74,7 +74,7 @@ int admin_login()
                 //Logging Admin login
                 char event[100];
                 snprintf(event, sizeof(event), "Admin %s login ", input_user);
-                log_event(event, input_user);
+                logging_event(event, input_user);
                 break;
             }
         }

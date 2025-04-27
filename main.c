@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "login.h"
 #include "game.h"
+
 int main() {
     loadgame_hash("games.csv");
     int input;
