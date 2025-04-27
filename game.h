@@ -12,17 +12,10 @@ typedef struct game
 } game;
 
 unsigned int hash(char name[]);
-
 void addGame(char name[], char genre[], float price);
-
 void loadgame_hash(char filename[]);
-
 void printgamelist();
-
 game *findGame(char name[]);
-
 void editGame(char name[], char newGenre[], float newPrice);
-
 void deleteGame(char name[]);
-
 #endif

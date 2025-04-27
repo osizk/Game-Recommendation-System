@@ -90,7 +90,6 @@ void printgamelist() {
     printf("----------------------------------------------------------\n\n");
 }
 
-
 game *findGame(char name[]) {
     unsigned int index = hash(name);
     game *current = Game_hash[index];

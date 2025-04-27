@@ -12,6 +12,7 @@ void adminMenu() {
     char newGenre[99];
     float newPrice;
 
+    
     while (1) {
         printgamelist();
 
