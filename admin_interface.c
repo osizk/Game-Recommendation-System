@@ -3,6 +3,7 @@
 #include <string.h>
 #include "admin_interface.h"
 #include "game.h"
+#include "logging_system.h"
 
 void adminMenu() {
     int choice;
@@ -41,6 +42,11 @@ void adminMenu() {
                 while (getchar() != '\n');
 
                 addGame(name, genre, price);
+                
+                char addGame[100];
+                snprintf(addGame, sizeof(addGame), "Add %s  ", name);
+                logging_event(addGame,"Admin");
+
                 break;
             case 2:
                 printf("Enter the name of the game to edit: ");
@@ -57,6 +63,10 @@ void adminMenu() {
                     while (getchar() != '\n');
 
                     editGame(name, newGenre, newPrice);
+
+                    char editGame[100];
+                    snprintf(editGame, sizeof(editGame), "Edit %s  ", name);
+                    logging_event(editGame,"Admin");
                 } else {
                     printf("Game '%s' not found. Cannot edit.\n", name);
                 }
@@ -67,6 +77,10 @@ void adminMenu() {
                 name[strcspn(name, "\n")] = 0;
 
                 deleteGame(name);
+
+                char deleteGame[100];
+                snprintf(deleteGame, sizeof(deleteGame), "Delete %s  ", name);
+                logging_event(deleteGame,"Admin");
                 break;
             case 4:
                 printf("Game list is shown above.\n");
