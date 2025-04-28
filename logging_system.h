@@ -7,6 +7,6 @@
 void logging_event(const char *event, const char *user);
 
 // Function to display the contents of the logging file
-void display_logging();
+void display_logging(const char *date);
 
 #endif // LOGGING_SYSTEM_H
