@@ -121,7 +121,7 @@ void deleteGame(char name[]) {
 
     while (current != NULL) {
 
-        if (strcasecmp(current->name, name) == 0) {
+        if (!strcasecmp(current->name, name)) {
 
             if (prev == NULL) {
 
@@ -138,4 +138,103 @@ void deleteGame(char name[]) {
         current = current->next;
     }
     printf("Game '%s' not found.\n", name);
+}
+
+void addRelation(char name1[],char name2[]) {
+    game *game1 = findGame(name1);
+    game *game2 = findGame(name2);
+    if (game1 == NULL) {
+        printf("Game '%s' not found!\n", name1);
+        return;
+    }
+    if (game2 == NULL) {
+        printf("Game '%s' not found!\n", name2);
+        return;
+    }
+    if (game1 == game2){
+        return;
+    }
+    for (int i=0;i<game1->relationcount;++i) {
+        if (game1->related[i] == game2) {
+            printf("Relation already exists between '%s' and '%s'\n", name1, name2);
+            return;
+        }
+    }
+    if (game1->relationcount < max_relation) {
+        game1->related[game1->relationcount] = game2;
+        game1->relationcount++;
+        printf("Added relation: '%s' -> '%s'\n", name1, name2);
+    }else{
+        printf("Cannot add more relations to '%s' (maximum reached)\n", name1);
+    }
+}
+
+void enqueue(queue **front,queue **rear, game *game){
+    queue *newnode = malloc(sizeof(queue));
+    newnode->game = game;
+    newnode->next = NULL;
+    
+    if (*front == NULL) {
+        *front = newnode;
+        *rear = newnode;
+    } else {
+        (*rear)->next = newnode;
+        *rear = newnode;
+    }
+}
+
+game* dequeue(queue **front, queue **rear) {
+    if (*front == NULL) {
+        return NULL;
+    }
+    queue *temp = *front;
+    game *result = temp->game;
+    
+    *front = (*front)->next;
+    if (*front == NULL) {
+        *rear = NULL; // Queue is now empty
+    }
+    free(temp);
+    return result;
+}
+
+void setVisited(){
+    for (int i = 0; i < tablesize; i++) {
+        game *current = Game_hash[i];
+        while (current != NULL) {
+            current->visited = 0;
+            current = current->next;
+        }
+    }
+}
+
+void BFS(char name[]){
+    game *Game = findGame(name);
+    if (Game == NULL) {
+        printf("Game '%s' not found!\n", name);
+        return;
+    }
+
+    setVisited(); // Clear all visited flags
+    queue *front = NULL;
+    queue *rear = NULL;
+
+    Game->visited = 1;
+    enqueue(&front,&rear,Game);
+    printf("Games related to '%s':\n", name);
+
+    while (front!=NULL) {
+        game *current = dequeue(&front,&rear);
+        
+        if (current != Game) {
+            printf("- %s (%s, $%.2f)\n", current->name, current->genre, current->price);
+        }
+
+        for (int i = 0; i < current->relationcount && i < max_relation; i++) {
+            if (current->related[i] != NULL && !current->related[i]->visited) {
+                current->related[i]->visited = 1;
+                enqueue(&front, &rear, current->related[i]);
+            }
+        }
+    }
 }
