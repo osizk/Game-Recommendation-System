@@ -6,7 +6,7 @@
 
 void CreateLogbyDate(char *filename, size_t size, const char *date)
 {  
-    snprintf(filename, size, LOG_FOLDER"/logging_%s.txt", date);
+    snprintf(filename, size, LOG_FOLDER"/logging_%s.csv", date);
 }
 
 // Function to log an event with associated user information to a file
@@ -27,7 +27,7 @@ void logging_event(const char *event, const char *user)
     CreateLogbyDate(filename, sizeof(filename),today);
 
     // Open the logging file in append mode
-    FILE *fp = fopen(filename,"a");
+    FILE *fp = fopen(filename,"a+");
     if(fp == NULL)
     {
         // Print an error if the file cannot be opened
@@ -35,17 +35,27 @@ void logging_event(const char *event, const char *user)
         return;
     }
 
+    //Check is Empty file or not if Empty Add Head of file
+    fseek(fp, 0, SEEK_END);   
+    long size = ftell(fp);    
+
+    if (size == 0) {
+        fprintf(fp, "Date,Time,Activity,User\n"); //Set Header of CSV
+    }
+
+    fseek(fp, 0, SEEK_END);
+
+
     // Format and print the log entry to the file
-    fprintf(fp, "%04d-%02d-%02d %02d:%02d:%02d | %s | %s\n",
-        t->tm_year + 1900, // Year since 1900
-        t->tm_mon + 1,     // Month (0-11, so add 1)
-        t->tm_mday,        // Day of the month
-        t->tm_hour,        // Hour
-        t->tm_min,         // Minute
-        t->tm_sec,         // Second
-        event,             // The event string
-        user               // The user string
-    );
+    fprintf(fp, "%04d-%02d-%02d,%02d:%02d:%02d,%s,%s\n",
+        t->tm_year + 1900,
+        t->tm_mon + 1,
+        t->tm_mday,
+        t->tm_hour,
+        t->tm_min,
+        t->tm_sec,
+        event,
+        user);
 
     // Close the file
     fclose(fp);
