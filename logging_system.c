@@ -55,7 +55,7 @@ void logging_event(const char *event, const char *user)
 void display_logging(const char *date)
 {
     char filename[256];
-    CreateLogFileNameByDate(filename, sizeof(filename), date);
+    CreateLogbyDate(filename, sizeof(filename), date);
     
     // Open the logging file in read mode (changed from "a" to "r" to read)
     FILE *fp = fopen(filename,"r");
