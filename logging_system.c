@@ -3,11 +3,18 @@
 #include <time.h>
 #include <string.h> // Include for strcspn if needed for string manipulation
 #define LOG_FOLDER "Logging"
+#define USER_FOLDER "UserLogging"
 
 void CreateLogbyDate(char *filename, size_t size, const char *date)
 {  
     snprintf(filename, size, LOG_FOLDER"/logging_%s.csv", date);
 }
+
+void CreateLogUser(char *filename, size_t size, const char *date,const char *user)
+{  
+    snprintf(filename, size, USER_FOLDER"/%s_%s.csv", user, date);
+}
+
 
 // Function to log an event with associated user information to a file
 void logging_event(const char *event, const char *user)
@@ -58,6 +65,49 @@ void logging_event(const char *event, const char *user)
         user);
 
     // Close the file
+    fclose(fp);
+}
+
+void logging_user(const char *event, const char *user)
+{
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+
+    char today[11];
+    snprintf(today, sizeof(today), "%04d-%02d-%02d",
+             t->tm_year + 1900,
+             t->tm_mon + 1,
+             t->tm_mday);
+
+    char filename[256];
+    snprintf(filename, sizeof(filename), USER_FOLDER"/user_%s_%s.csv", user, today);
+
+    FILE *fp = fopen(filename, "a+");
+    if (fp == NULL)
+    {
+        printf("Can't open user log file: %s\n", filename);
+        return;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    long size = ftell(fp);
+
+    if (size == 0) {
+        fprintf(fp, "Date,Time,Activity,User\n"); 
+    }
+
+    fseek(fp, 0, SEEK_END);
+
+    fprintf(fp, "%04d-%02d-%02d,%02d:%02d:%02d,%s,%s\n",
+            t->tm_year + 1900,
+            t->tm_mon + 1,
+            t->tm_mday,
+            t->tm_hour,
+            t->tm_min,
+            t->tm_sec,
+            event,
+            user);
+
     fclose(fp);
 }
 
