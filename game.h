@@ -22,7 +22,8 @@ typedef struct queue {
 
 unsigned int hash(char name[]);
 void addGame(char name[], char genre[], float price);
-void loadgame_hash(char filename[]);
+void loadGame(char filename[]);
+void loadRelations(char filename[]);
 void printgamelist();
 game *findGame(char name[]);
 void editGame(char name[], char newGenre[], float newPrice);

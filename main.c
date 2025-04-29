@@ -4,8 +4,8 @@
 #include "admin_interface.h"
 
 int main() {
-    loadgame_hash("games.csv");
-
+    loadGame("games.csv");
+    loadRelations("relations.csv");
     int input;
 
     while (1) {
@@ -29,6 +29,8 @@ int main() {
             if (user_login()) {
                 printf("Customer login successful.\n");
                 printgamelist();
+                BFS("God of War Ragnarok");
+                BFS("The Witcher 3: Wild Hunt");
             } else {
                 printf("Customer login failed.\n");
             }

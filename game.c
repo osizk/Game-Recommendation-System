@@ -42,22 +42,19 @@ void addGame(char name[], char genre[], float price) {
 }
 
 
-void loadgame_hash(char filename[]) {
+void loadGame(char filename[]) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         printf("Error opening file '%s'!\n", filename);
         return;
     }
     char line[256];
-
-
     while (fgets(line, sizeof(line), file)) {
         char name[99];
         char genre[99];
         float price;
 
         if (sscanf(line, "%[^,],%[^,],%f", name, genre, &price) == 3) {
-
             addGame(name, genre, price);
         } else {
             printf("Skipping malformed line in %s: %s", filename, line);
@@ -67,6 +64,23 @@ void loadgame_hash(char filename[]) {
     fclose(file);
 }
 
+void loadRelations(char filename[]) {
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        perror("Error opening relations file");
+        return;
+    }
+    
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        char game1[100], game2[100];
+        if (sscanf(line, "%[^,],%[^\n]", game1, game2) == 2) {
+            addRelation(game1, game2);
+            addRelation(game2, game1);
+        }
+    }
+    fclose(file);
+}
 
 void printgamelist() {
     printf("\n--- Game List ---\n");
@@ -192,7 +206,7 @@ game* dequeue(queue **front, queue **rear) {
     
     *front = (*front)->next;
     if (*front == NULL) {
-        *rear = NULL; // Queue is now empty
+        *rear = NULL;
     }
     free(temp);
     return result;
@@ -215,7 +229,7 @@ void BFS(char name[]){
         return;
     }
 
-    setVisited(); // Clear all visited flags
+    setVisited();
     queue *front = NULL;
     queue *rear = NULL;
 
