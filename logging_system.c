@@ -10,9 +10,9 @@ void CreateLogbyDate(char *filename, size_t size, const char *date)
     snprintf(filename, size, LOG_FOLDER"/logging_%s.csv", date);
 }
 
-void CreateLogUser(char *filename, size_t size, const char *date,const char *user)
+void CreateLogUser(char *filename, size_t size,const char *user)
 {  
-    snprintf(filename, size, USER_FOLDER"/%s_%s.csv", user, date);
+    snprintf(filename, size, USER_FOLDER"/%s.csv", user);
 }
 
 
@@ -73,14 +73,8 @@ void logging_user(const char *event, const char *user)
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
 
-    char today[11];
-    snprintf(today, sizeof(today), "%04d-%02d-%02d",
-             t->tm_year + 1900,
-             t->tm_mon + 1,
-             t->tm_mday);
-
     char filename[256];
-    snprintf(filename, sizeof(filename), USER_FOLDER"/user_%s_%s.csv", user, today);
+    CreateLogUser(filename, sizeof(filename), user);
 
     FILE *fp = fopen(filename, "a+");
     if (fp == NULL)
@@ -89,14 +83,14 @@ void logging_user(const char *event, const char *user)
         return;
     }
 
+
     fseek(fp, 0, SEEK_END);
     long size = ftell(fp);
-
     if (size == 0) {
-        fprintf(fp, "Date,Time,Activity,User\n"); 
+        fprintf(fp, "Date,Time,Activity,User\n");
     }
 
-    fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_END); 
 
     fprintf(fp, "%04d-%02d-%02d,%02d:%02d:%02d,%s,%s\n",
             t->tm_year + 1900,
@@ -111,32 +105,25 @@ void logging_user(const char *event, const char *user)
     fclose(fp);
 }
 
-// Function to display the contents of the logging file
-void display_logging(const char *date)
+void display_user_logging(const char *user)
 {
     char filename[256];
-    CreateLogbyDate(filename, sizeof(filename), date);
-    
-    // Open the logging file in read mode (changed from "a" to "r" to read)
-    FILE *fp = fopen(filename,"r");
-    if(fp == NULL)
+    CreateLogUser(filename, sizeof(filename), user);
+
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL)
     {
-        // Print an error if the file cannot be opened
-        // Note: If the file doesn't exist yet, this is expected.
-        printf("Can't open file: %s\n", filename);
+        printf("No log found for user: %s\n", user);
         return;
     }
 
     char line[512];
-    printf("\n----System Logging Head----\n"); // Added newlines for better formatting
-    // Read and print each line from the logging file
+    printf("\n---- User Logging: %s ----\n", user);
     while (fgets(line, sizeof(line), fp) != NULL)
     {
         printf("%s", line);
     }
-    printf("----System Logging Bottom----\n\n"); // Added newlines for better formatting
+    printf("---- End of User Logging ----\n\n");
 
-    // Close the file
     fclose(fp);
 }
-
