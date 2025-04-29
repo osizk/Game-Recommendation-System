@@ -43,10 +43,6 @@ void adminMenu() {
                 while (getchar() != '\n');
 
                 addGame(name, genre, price);
-                
-                char addGame[100];
-                snprintf(addGame, sizeof(addGame), "Add %s  ", name);
-                logging_event(addGame,"Admin");
 
                 break;
             case 2:
@@ -65,9 +61,6 @@ void adminMenu() {
 
                     editGame(name, newGenre, newPrice);
 
-                    char editGame[100];
-                    snprintf(editGame, sizeof(editGame), "Edit %s  ", name);
-                    logging_event(editGame,"Admin");
                 } else {
                     printf("Game '%s' not found. Cannot edit.\n", name);
                 }
@@ -79,9 +72,6 @@ void adminMenu() {
 
                 deleteGame(name);
 
-                char deleteGame[100];
-                snprintf(deleteGame, sizeof(deleteGame), "Delete %s  ", name);
-                logging_event(deleteGame,"Admin");
                 break;
             case 4:
 

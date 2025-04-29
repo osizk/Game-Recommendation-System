@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <strings.h>
 #include "game.h"
+#include "logging_system.h"
 
 game *Game_hash[tablesize] = {NULL};
 
@@ -39,6 +40,9 @@ void addGame(char name[], char genre[], float price) {
         current->next = newNode;
     }
     printf("Game '%s' added successfully.\n", name);
+    char addGame[100];
+    snprintf(addGame, sizeof(addGame), "Add %s  ", name);
+    logging_event(addGame,"Admin");
 }
 
 
@@ -146,6 +150,9 @@ void editGame(char name[], char newGenre[], float newPrice) {
         strcpy(gameToEdit->genre, newGenre);
         gameToEdit->price = newPrice;
         printf("Game '%s' updated successfully.\n", name);
+        char editGame[100];
+        snprintf(editGame, sizeof(editGame), "Edit %s  ", name);
+        logging_event(editGame,"Admin");
     } else {
         printf("Game '%s' not found.\n", name);
     }
@@ -168,6 +175,10 @@ void deleteGame(char name[]) {
             }
             free(current);
             printf("Game '%s' deleted successfully.\n", name);
+            char deleteGame[100];
+            snprintf(deleteGame, sizeof(deleteGame), "Delete %s  ", name);
+            logging_event(deleteGame,"Admin");
+
             return;
         }
         prev = current;
