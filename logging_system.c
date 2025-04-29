@@ -113,7 +113,8 @@ void display_user_logging(const char *user)
     FILE *fp = fopen(filename, "r");
     if (fp == NULL)
     {
-        printf("No log found for user: %s\n", user);
+        printf("\n---- User Logging: %s ----\n", user);
+        printf("---- End of User Logging ----\n\n");
         return;
     }
 
@@ -124,6 +125,29 @@ void display_user_logging(const char *user)
         printf("%s", line);
     }
     printf("---- End of User Logging ----\n\n");
+
+    fclose(fp);
+}
+
+void display_logging(const char *date)
+{
+    char filename[256];
+    CreateLogbyDate(filename, sizeof(filename), date);  
+
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL)
+    {
+        printf("Can't open file: %s\n", filename);
+        return;
+    }
+
+    char line[512];
+    printf("\n---- System Logging: %s ----\n", date);
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
+        printf("%s", line);
+    }
+    printf("---- End of System Logging ----\n\n");
 
     fclose(fp);
 }
