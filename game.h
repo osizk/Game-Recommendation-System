@@ -3,9 +3,8 @@
 
 #define tablesize 20
 #define max_relation 100
-
-typedef struct game
-{
+#define max_cart 20
+typedef struct game{
     char name[99];
     char genre[99];
     float price;
@@ -15,10 +14,23 @@ typedef struct game
     int visited;
 }game;
 
-typedef struct queue {
+typedef struct queue{
     struct game *game;
     struct queue *next;
 }queue;
+
+typedef struct CartItem {
+    game* game;
+    struct CartItem* next;
+} CartItem;
+
+typedef struct {
+    CartItem* front;
+    CartItem* rear;
+    int count;
+    float total;
+    //CartItem* items[tablesize];
+} Cart;
 
 unsigned int hash(char name[]);
 void addGame(char name[], char genre[], float price);
@@ -35,4 +47,9 @@ void enqueue(queue **front,queue **rear, game *game);
 game* dequeue(queue **front,queue **rear);
 void setVisited();
 void BFS(char name[]);
+void setCart();
+void addtoCart(char name[]);
+void deletefromCart(char name[]);
+void viewCart();
+void checkout();
 #endif

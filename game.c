@@ -6,8 +6,8 @@
 #include "game.h"
 #include "logging_system.h"
 
-game *Game_hash[tablesize] = {NULL};
-
+game *hashIndex[tablesize] = {NULL};
+Cart cart;
 unsigned int hash(char name[]) {
     unsigned int hash_value = 0;
     while (*name) {
@@ -30,10 +30,10 @@ void addGame(char name[], char genre[], float price) {
     newNode->price = price;
     newNode->next = NULL;
 
-    if (Game_hash[index] == NULL) {
-        Game_hash[index] = newNode;
+    if (hashIndex[index] == NULL) {
+        hashIndex[index] = newNode;
     } else {
-        game *current = Game_hash[index];
+        game *current = hashIndex[index];
         while (current->next != NULL) {
             current = current->next;
         }
@@ -90,7 +90,7 @@ void printgamelist() {
 
     int game_count = 0;
     for (int i = 0; i < tablesize; ++i) {
-        game *temp = Game_hash[i];
+        game *temp = hashIndex[i];
         while (temp != NULL) {
 
             printf("%-30s %-20s %-10.2f\n", temp->name, temp->genre, temp->price);
@@ -129,7 +129,7 @@ int compareWithoutspaces(char name1[], char name2[]) {
 
 game *findGame(char name[]) {
     unsigned int index = hash(name);
-    game *current = Game_hash[index];
+    game *current = hashIndex[index];
 
     while (current != NULL) {
         if (compareWithoutspaces(current->name, name) == 0) {
@@ -156,7 +156,7 @@ void editGame(char name[], char newGenre[], float newPrice) {
 }
 void deleteGame(char name[]) {
     unsigned int index = hash(name);
-    game *current = Game_hash[index];
+    game *current = hashIndex[index];
     game *prev = NULL;
 
     while (current != NULL) {
@@ -165,7 +165,7 @@ void deleteGame(char name[]) {
 
             if (prev == NULL) {
 
-                Game_hash[index] = current->next;
+                hashIndex[index] = current->next;
             } else {
 
                 prev->next = current->next;
@@ -244,7 +244,7 @@ game* dequeue(queue **front, queue **rear) {
 
 void setVisited(){
     for (int i = 0; i < tablesize; i++) {
-        game *current = Game_hash[i];
+        game *current = hashIndex[i];
         while (current != NULL) {
             current->visited = 0;
             current = current->next;
@@ -258,7 +258,6 @@ void BFS(char name[]){
         printf("Game '%s' not found!\n", name);
         return;
     }
-
     setVisited();
     queue *front = NULL;
     queue *rear = NULL;
@@ -280,5 +279,108 @@ void BFS(char name[]){
                 enqueue(&front, &rear, current->related[i]);
             }
         }
+    }
+}
+
+void setCart(){
+    cart.front = NULL;
+    cart.rear = NULL;
+    cart.count = 0;
+    cart.total = 0;
+}
+
+void addtoCart(char name[]){
+    if(cart.count >= max_cart) {
+        printf("Cart is full! Maximum %d items allowed.\n", max_cart);
+        return;
+    }
+    game *found = findGame(name);
+    if(found == NULL) {
+        printf("Game '%s' not found!\n", name);
+        return;
+    }
+    CartItem* newItem = malloc(sizeof(CartItem));
+    newItem->game = found;
+    newItem->next = NULL;
+
+    if(cart.front == NULL) {
+        cart.front = newItem;
+        cart.rear = newItem;
+    } else {
+        cart.rear->next = newItem;
+        cart.rear = newItem;
+    }
+    cart.count++;
+    cart.total+=found->price;
+
+    printf("Added to cart: %s ($%.2f)\n", found->name, found->price);
+    printf("Cart now has %d items (Total: $%.2f)\n", cart.count, cart.total);
+}
+
+void deletefromCart(char name[]){
+    if(cart.count == 0) {
+        printf("Cart is empty!\n");
+        return;
+    }
+    CartItem *current=cart.front;
+    CartItem *prev=NULL;
+    while(current!=NULL){
+        if(!compareWithoutspaces(current->game->name,name)){
+            if(prev==NULL){
+                cart.front=current->next;
+            }else{
+                prev->next=current->next;
+            }
+            if(current == cart.rear) {
+                cart.rear = prev;
+            }
+            cart.count--;
+            cart.total -= current->game->price;
+            printf("Removed from cart: %s\n", current->game->name);
+            printf("Cart now has %d items (Total: $%.2f)\n", cart.count, cart.total);
+        }
+        prev = current;
+        current = current->next;
+    }
+}
+
+void viewCart(){
+    printf("\n--- Your Shopping Cart ---\n");
+    if(cart.count == 0) {
+        printf("Your cart is empty\n");
+        return;
+    }
+    
+    printf("%-30s %-20s %-10s\n","Game","Genre","Price");
+    printf("-----------------------------------------------------------\n");
+    
+    CartItem* current = cart.front;
+    while(current != NULL) {
+        printf("%-30s %-20s $%-9.2f\n", current->game->name,current->game->genre,current->game->price);
+        current = current->next;
+    }
+    
+    printf("\nTotal: $%.2f\n", cart.total);
+    printf("-----------------------------------------------------------\n");
+}
+
+void checkout(){
+    if(cart.count == 0) {
+        printf("Your cart is empty!\n");
+        return;
+    }
+    printf("\n---- Cart Summary ----\n");
+    viewCart();
+    printf("\nConfirm purchase (y/n): ");
+    char confirm;
+    scanf("%c", &confirm);
+    //getchar(); // Clear newline
+    
+    if(tolower(confirm) == 'y') {
+        printf("\nPurchase completed! Thank you!\n");
+        printf("Total charged: $%.2f\n", cart.total);      
+        setCart(); // Reset cart
+    } else {
+        printf("Purchase cancelled\n");
     }
 }
