@@ -90,28 +90,3 @@ void display_logging(const char *date)
     fclose(fp);
 }
 
-//Prepare for main
-
-/*
-#include "logging_system.h"
-#include <stdio.h>
-
-int main()
-{
-    int choice;
-    char date[11];
-
-    printf("1. watch Logging\n");
-    scanf("%d", &choice);
-
-    if (choice == 1) {
-        printf("Select Date (format: YYYY-MM-DD): ");
-        scanf("%10s", date);
-        display_logging_by_date(date);
-    } else {
-        printf("Wrong choice\n");
-    }
-
-    return 0;
-}
-*/

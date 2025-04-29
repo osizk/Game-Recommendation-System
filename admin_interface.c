@@ -21,6 +21,7 @@ void adminMenu() {
         printf("1. Add Game\n");
         printf("2. Edit Game\n");
         printf("3. Delete Game\n");
+        printf("4. Watch Logging\n");
         printf("5. Back to Main Menu\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
@@ -83,9 +84,16 @@ void adminMenu() {
                 logging_event(deleteGame,"Admin");
                 break;
             case 4:
-                printf("Game list is shown above.\n");
+
+                char date[11];
+                printf("Select Date (format: YYYY-MM-DD): ");
+                scanf("%10s", date);
+                display_logging_by_date(date);
                 break;
             case 5:
+                printf("Game list is shown above.\n");
+                break;
+            case 6:
                 printf("Returning to main menu...\n");
                 return;
             default:
