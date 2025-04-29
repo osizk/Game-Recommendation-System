@@ -40,9 +40,6 @@ void addGame(char name[], char genre[], float price) {
         current->next = newNode;
     }
     printf("Game '%s' added successfully.\n", name);
-    char addGame[100];
-    snprintf(addGame, sizeof(addGame), "Add %s  ", name);
-    logging_event(addGame,"Admin");
 }
 
 

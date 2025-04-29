@@ -44,6 +44,10 @@ void adminMenu() {
 
                 addGame(name, genre, price);
 
+                char addGame[100];
+                snprintf(addGame, sizeof(addGame), "Add %s  ", name);
+                logging_event(addGame,"Admin");
+
                 break;
             case 2:
                 printf("Enter the name of the game to edit: ");
