@@ -22,7 +22,7 @@ void adminMenu() {
         printf("2. Edit Game\n");
         printf("3. Delete Game\n");
         printf("4. Watch Logging\n");
-        printf("5. Back to Main Menu\n");
+        printf("6. Back to Main Menu\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
