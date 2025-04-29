@@ -373,13 +373,11 @@ void checkout(){
     viewCart();
     printf("\nConfirm purchase (y/n): ");
     char confirm;
-    scanf("%c", &confirm);
-    //getchar(); // Clear newline
-    
+    scanf("%c", &confirm);    
     if(tolower(confirm) == 'y') {
         printf("\nPurchase completed! Thank you!\n");
         printf("Total charged: $%.2f\n", cart.total);      
-        setCart(); // Reset cart
+        setCart();
     } else {
         printf("Purchase cancelled\n");
     }
