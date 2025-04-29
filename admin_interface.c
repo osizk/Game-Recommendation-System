@@ -88,7 +88,7 @@ void adminMenu() {
                 char date[11];
                 printf("Select Date (format: YYYY-MM-DD): ");
                 scanf("%10s", date);
-                display_logging_by_date(date);
+                display_logging(date);
                 break;
             case 5:
                 printf("Game list is shown above.\n");
