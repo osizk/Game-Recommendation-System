@@ -25,6 +25,8 @@ void addGame(char name[], char genre[], float price);
 void loadGame(char filename[]);
 void loadRelations(char filename[]);
 void printgamelist();
+void removeSpaces(char str[]);
+int compareWithoutspaces(char name1[], char name2[]);
 game *findGame(char name[]);
 void editGame(char name[], char newGenre[], float newPrice);
 void deleteGame(char name[]);

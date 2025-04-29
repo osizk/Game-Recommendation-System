@@ -2,7 +2,7 @@
 #include "login.h"
 #include "game.h"
 #include "admin_interface.h"
-
+#include "customer_interface.h"
 int main() {
     loadGame("games.csv");
     loadRelations("relations.csv");
@@ -29,8 +29,7 @@ int main() {
             if (user_login()) {
                 printf("Customer login successful.\n");
                 printgamelist();
-                BFS("God of War Ragnarok");
-                BFS("The Witcher 3: Wild Hunt");
+                customerMenu();
             } else {
                 printf("Customer login failed.\n");
             }

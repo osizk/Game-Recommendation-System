@@ -104,12 +104,34 @@ void printgamelist() {
     printf("----------------------------------------------------------\n\n");
 }
 
+void removeSpaces(char str[])
+{
+    int index = 0;
+    for (int i = 0; str[i]; i++){
+        if (str[i] != ' '){
+            str[index] = str[i];
+            index++;
+        }
+    }
+    str[index] = '\0';
+}
+
+int compareWithoutspaces(char name1[], char name2[]) {
+    char temp1[100];
+    char temp2[100];
+    strcpy(temp1, name1);
+    strcpy(temp2, name2);
+    removeSpaces(temp1);
+    removeSpaces(temp2);
+    return strcasecmp(temp1, temp2);
+}
+
 game *findGame(char name[]) {
     unsigned int index = hash(name);
     game *current = Game_hash[index];
 
     while (current != NULL) {
-        if (strcasecmp(current->name, name) == 0) {
+        if (compareWithoutspaces(current->name, name) == 0) {
             return current;
         }
         current = current->next;
