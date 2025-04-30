@@ -30,7 +30,6 @@ typedef struct {
     CartItem* rear;
     int count;
     float total;
-    //CartItem* items[tablesize];
 } Cart;
 
 unsigned int hash(char name[]);
