@@ -4,6 +4,7 @@
 #define tablesize 20
 #define max_relation 100
 #define max_cart 20
+
 typedef struct game{
     char name[99];
     char genre[99];

@@ -8,6 +8,7 @@
 
 game *hashIndex[tablesize] = {NULL};
 Cart cart;
+
 unsigned int hash(char name[]) {
     unsigned int hash_value = 0;
     while (*name) {
@@ -124,6 +125,7 @@ int compareWithoutspaces(char name1[], char name2[]) {
     strcpy(temp2, name2);
     removeSpaces(temp1);
     removeSpaces(temp2);
+    //printf("temp1= %s temp2= %s\n",temp1,temp2);
     return strcasecmp(temp1, temp2);
 }
 
