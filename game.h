@@ -52,5 +52,5 @@ void setCart();
 void addtoCart(char name[]);
 void deletefromCart(char name[]);
 void viewCart();
-void checkout();
+void checkout(const char *username);
 #endif

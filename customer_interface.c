@@ -1,8 +1,9 @@
 #include<stdio.h>
 #include<string.h>
 #include"game.h"
+#include "logging_system.h"
 
-void customerMenu(){
+void customerMenu(const char *username){
     setCart();
     int input;
     int x=1;
@@ -14,7 +15,8 @@ void customerMenu(){
         printf("[3] Delete from cart\n");
         printf("[4] View cart\n");
         printf("[5] Checkout\n");
-        printf("[6] Exit\n");
+        printf("[6] View History\n");
+        printf("[7] Exit\n");
         printf("Enter your choice: ");
         scanf("%d",&input);
         while(getchar() != '\n');
@@ -45,9 +47,12 @@ void customerMenu(){
             viewCart();
             break;
         case 5:
-            checkout();
+            checkout(username);
             break;
         case 6:
+            display_user_logging(username);
+            break;
+        case 7:
             x=0;
             break;
         default:

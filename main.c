@@ -26,10 +26,11 @@ int main() {
                 printf("Admin login failed.\n");
             }
         } else if (input == 2) {
-            if (user_login()) {
+            char username[50];
+            if (user_login(username)) {
                 printf("Customer login successful.\n");
                 printgamelist();
-                customerMenu();
+                customerMenu(username);
             } else {
                 printf("Customer login failed.\n");
             }

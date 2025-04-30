@@ -3,7 +3,7 @@
 #include <string.h>
 #include "logging_system.h"
 
-int user_login() {
+int user_login(char *username) {
     FILE *file = fopen("users.csv", "r");
     if (file == NULL) {
         printf("Error opening file!\n");
@@ -27,8 +27,9 @@ int user_login() {
         if (sscanf(line, "%[^,],%s", file_user, file_pass) == 2) {
             if (strcmp(input_user, file_user) == 0 && strcmp(input_pass, file_pass) == 0) {
                 check = 1;
+                strcpy(username, input_user); 
                 char event[100];
-                snprintf(event, sizeof(event), "User %s login ", input_user);
+                snprintf(event, sizeof(event), "User %s login", input_user);
                 logging_event(event, input_user);
                 break;
             }

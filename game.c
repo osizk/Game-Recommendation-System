@@ -366,7 +366,7 @@ void viewCart(){
     printf("-----------------------------------------------------------\n");
 }
 
-void checkout(){
+void checkout(const char *username){
     if(cart.count == 0) {
         printf("Your cart is empty!\n");
         return;
@@ -378,7 +378,17 @@ void checkout(){
     scanf("%c", &confirm);    
     if(tolower(confirm) == 'y') {
         printf("\nPurchase completed! Thank you!\n");
-        printf("Total charged: $%.2f\n", cart.total);      
+        printf("Total charged: $%.2f\n", cart.total);
+        
+        CartItem* current = cart.front;
+        while (current != NULL) 
+        {
+            char activity[200];
+            snprintf(activity, sizeof(activity), "Purchased Game: %s ($%.2f)",current->game->name, current->game->price);
+            logging_user(activity, username);
+            current = current->next;
+        }
+
         setCart();
     } else {
         printf("Purchase cancelled\n");
