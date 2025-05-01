@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "logging_system.h"
+#include "game.h"
 
 int user_login(char *username) {
+    loadUserPurchaseHistory(username);
     FILE *file = fopen("users.csv", "r");
     if (file == NULL) {
         printf("Error opening file!\n");

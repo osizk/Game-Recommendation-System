@@ -3,10 +3,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <strings.h>
+#include <time.h>
 #include "game.h"
 #include "logging_system.h"
 
 game *hashIndex[tablesize] = {NULL};
+UserPurchase* currentUserPurchase = NULL;
 Cart cart;
 
 unsigned int hash(char name[]) {
@@ -379,7 +381,8 @@ void checkout(const char *username){
     if(tolower(confirm) == 'y') {
         printf("\nPurchase completed! Thank you!\n");
         printf("Total charged: $%.2f\n", cart.total);
-        
+        recordPurchase(username,&cart);
+        saveUserPurchaseHistory(username);
         CartItem* current = cart.front;
         while (current != NULL) 
         {
@@ -392,5 +395,103 @@ void checkout(const char *username){
         setCart();
     } else {
         printf("Purchase cancelled\n");
+    }
+}
+
+void loadUserPurchaseHistory(const char* username) {
+    char filename[150];
+    snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
+    
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        currentUserPurchase = malloc(sizeof(UserPurchase));
+        strcpy(currentUserPurchase->username, username);
+        currentUserPurchase->purchaseCount = 0;
+        currentUserPurchase->next = NULL;
+        return;
+    }
+    
+    currentUserPurchase = malloc(sizeof(UserPurchase));
+    strcpy(currentUserPurchase->username, username);
+    currentUserPurchase->purchaseCount = 0;
+    currentUserPurchase->next = NULL;
+    
+    char line[256];
+    fgets(line, sizeof(line), file);
+    
+    while (fgets(line, sizeof(line), file) && currentUserPurchase->purchaseCount < max_cart) {
+        char name[100], genre[100], date[20];
+        float price;
+        
+        if (sscanf(line, "\"%[^\"]\",\"%[^\"]\",%f,%19s", 
+                  name, genre, &price, date) == 4) {
+            
+            game* purchasedGame = findGame(name);
+            if (purchasedGame) {
+                currentUserPurchase->purchasedGames[currentUserPurchase->purchaseCount] = purchasedGame;
+                currentUserPurchase->purchaseCount++;
+            }
+        }
+    }
+    
+    fclose(file);
+}
+
+void saveUserPurchaseHistory(const char* username) {
+    if (!currentUserPurchase) return;
+    
+    char filename[100];
+    snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
+    
+    FILE* newFile = fopen("temp.csv", "w");
+    
+    if (!newFile) {
+        printf("Error creating temporary file\n");
+        return;
+    }
+    
+    fprintf(newFile, "Game,Genre,Price,PurchaseDate\n");
+    
+    time_t now = time(NULL);
+    struct tm* tm_info = localtime(&now);
+    char date_str[20];
+    strftime(date_str, sizeof(date_str), "%Y-%m-%d", tm_info);
+    
+    for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
+        if (currentUserPurchase->purchasedGames[i] != NULL) {
+            fprintf(newFile, "\"%s\",\"%s\",%.2f,%s\n",currentUserPurchase->purchasedGames[i]->name,currentUserPurchase->purchasedGames[i]->genre,currentUserPurchase->purchasedGames[i]->price,date_str);
+        }
+    }
+    
+    fclose(newFile);
+    
+    remove(filename);
+    rename("temp.csv", filename);
+}
+
+void recordPurchase(const char* username, Cart* cart) {
+    if (!currentUserPurchase) {
+        currentUserPurchase = malloc(sizeof(UserPurchase));
+        strcpy(currentUserPurchase->username, username);
+        currentUserPurchase->purchaseCount = 0;
+        currentUserPurchase->next = NULL;
+    }
+    loadUserPurchaseHistory(username);
+    CartItem* item = cart->front;
+    while (item != NULL && currentUserPurchase->purchaseCount < max_cart) {
+        int alreadyPurchased = 0;
+        for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
+            if (compareWithoutspaces(currentUserPurchase->purchasedGames[i]->name, item->game->name) == 0) {
+                alreadyPurchased = 1;
+                break;
+            }
+        }
+        
+        if (!alreadyPurchased) {
+            currentUserPurchase->purchasedGames[currentUserPurchase->purchaseCount] = item->game;
+            currentUserPurchase->purchaseCount++;
+        }
+        
+        item = item->next;
     }
 }

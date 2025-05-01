@@ -32,6 +32,13 @@ typedef struct {
     float total;
 } Cart;
 
+typedef struct UserPurchase {
+    char username[100];
+    game* purchasedGames[max_cart];  // Track purchased games
+    int purchaseCount;
+    struct UserPurchase* next;
+} UserPurchase;
+
 unsigned int hash(char name[]);
 void addGame(char name[], char genre[], float price);
 void loadGame(char filename[]);
@@ -52,4 +59,7 @@ void addtoCart(char name[]);
 void deletefromCart(char name[]);
 void viewCart();
 void checkout(const char *username);
+void loadUserPurchaseHistory(const char* username);
+void saveUserPurchaseHistory(const char* username);
+void recordPurchase(const char* username, Cart* cart);
 #endif
