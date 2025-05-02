@@ -34,10 +34,12 @@ typedef struct {
 
 typedef struct UserPurchase {
     char username[100];
-    game* purchasedGames[max_cart];  // Track purchased games
+    game* purchasedGames[max_cart];
     int purchaseCount;
     struct UserPurchase* next;
 } UserPurchase;
+
+void saveGameListToCSV(const char* filename);
 
 unsigned int hash(char name[]);
 void addGame(char name[], char genre[], float price);
@@ -62,5 +64,5 @@ void checkout(const char *username);
 void loadUserPurchaseHistory(const char* username);
 void saveUserPurchaseHistory(const char* username);
 void recordPurchase(const char* username, Cart* cart);
-void saveGamelist(const char* filename);
+
 #endif
