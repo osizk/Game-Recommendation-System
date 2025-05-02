@@ -104,7 +104,6 @@ void customerMenu(const char *username){
                 default:
                     printf("\nInvalid input. Please try again.\n");
                     printf("\nPress Enter to continue...");
-                    //getchar();
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 }
