@@ -16,11 +16,9 @@
 #endif
 
 void displayMainMenu() {
+    CLEAR_SCREEN();
     printf("\n+-----------------------------+\n");
     printf("|      Game System Menu       |\n");
-    printf("+-----------------------------+\n");
-    printf("\n+-----------------------------+\n");
-    printf("|         Main Menu           |\n");
     printf("+-----------------------------+\n");
     printf("| [1] Admin Login             |\n");
     printf("| [2] Customer Login          |\n");
@@ -32,31 +30,27 @@ void displayMainMenu() {
 int main() {
     loadGame("games.csv");
     loadRelations("relations.csv");
-
+    int c;
     int choice;
     char username[100];
 
     while (1) {
-        CLEAR_SCREEN();
         displayMainMenu();
 
         char input_str[10];
         if (fgets(input_str, sizeof(input_str), stdin) != NULL) {
             if (sscanf(input_str, "%d", &choice) == 1) {
-
                 switch (choice) {
                     case 1:
                         if (admin_login()) {
                             printf("\nAdmin login successful!\n");
-                            int c;
+                            printf("Press Enter to continue...");
                             while ((c = getchar()) != '\n' && c != EOF);
                             adminMenu();
                         } else {
                             printf("\nAdmin login failed.\n");
-                             printf("\nPress Enter to continue...");
-                             getchar();
-                             int c2;
-                             while ((c2 = getchar()) != '\n' && c2 != EOF);
+                            printf("Press Enter to continue...");
+                            while ((c = getchar()) != '\n' && c != EOF);
                         }
                         break;
                     case 2: {
@@ -64,33 +58,29 @@ int main() {
                         while ((c3 = getchar()) != '\n' && c3 != EOF);
                         if (user_login(username)) {
                             printf("\nWelcome, %s!\n", username);
-                            int c4;
-                            while ((c4 = getchar()) != '\n' && c4 != EOF);
+                            printf("Press Enter to continue...");
+                            while ((c = getchar()) != '\n' && c != EOF);
                             customerMenu(username);
                         } else {
                             printf("\nUser login failed.\n");
-                            printf("\nPress Enter to continue...");
-                            getchar();
-                            int c5;
-                            while ((c5 = getchar()) != '\n' && c5 != EOF);
+                            printf("Press Enter to continue...");
+                            while ((c = getchar()) != '\n' && c != EOF);
                         }
                         break;
-                        }
+                    }
                     case 3:
                         printf("\nExiting Game System. Goodbye!\n");
                         return 0;
                     default:
                         printf("\nInvalid choice. Please enter a number between 1 and 3.\n");
-                         printf("\nPress Enter to continue...");
-                         getchar();
-                         int c6;
-                         while ((c6 = getchar()) != '\n' && c6 != EOF);
+                        printf("Press Enter to continue...");
+                        while ((c = getchar()) != '\n' && c != EOF);
                 }
             } else {
                 printf("\nInvalid input. Please enter a number.\n");
-                 printf("\nPress Enter to continue...");
-                 int c;
-                 while ((c = getchar()) != '\n' && c != EOF);
+                printf("Press Enter to continue...");
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF);
             }
         } else {
             printf("\nError reading input. Exiting.\n");

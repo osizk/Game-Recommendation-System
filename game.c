@@ -443,13 +443,14 @@ void deletefromCart(char name[]){
 }
 
 void viewCart(){
-    printf("\n+--------------------------------------------------+\n");
-    printf("|               Your Shopping Cart                 |\n");
-    printf("+--------------------------------------------------+\n");
+    system("cls");
+    printf("\n+--------------------------------------------------------------+\n");
+    printf("|                     Your Shopping Cart                       |\n");
+    printf("+------------------------------+--------------------+----------+\n");
 
     if(cart.count == 0) {
-        printf("| %-64s |\n", "Your cart is empty.");
-        printf("+--------------------------------------------------+\n\n");
+        printf("|Your cart is empty                                            |\n");
+        printf("+--------------------------------------------------------------+\n");
         return;
     }
 
@@ -463,8 +464,8 @@ void viewCart(){
     }
 
     printf("+------------------------------+--------------------+----------+\n");
-    printf("| %-55sTotal: $%-8.2f |\n", "", cart.total);
-    printf("+--------------------------------------------------+\n\n");
+    printf("|Total: $%.2f                                                  |\n", cart.total);
+    printf("+--------------------------------------------------------------+\n\n");
 }
 
 void checkout(const char *username){
@@ -628,6 +629,7 @@ void recordPurchase(const char* username, Cart* cart) {
 }
 
 void recommendBasedOnHistory(const char* username) {
+    system("cls");
     if (currentUserPurchase == NULL || strcmp(currentUserPurchase->username, username) != 0) {
         loadUserPurchaseHistory(username);
     }
@@ -646,8 +648,6 @@ void recommendBasedOnHistory(const char* username) {
     int genreCount = 0;
     
     for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
-        //game* purchased = currentUserPurchase->purchasedGames[i];
-        
         // find genre frequency
         int found = 0;
         for (int j = 0; j < genreCount; j++) {
@@ -737,11 +737,7 @@ void recommendBasedOnHistory(const char* username) {
     }
     
     // Display
-    printf("\n--- Personalized Recommendations for %s ---\n", username);
-    printf("Based on your %d purchased games in these genres:\n", currentUserPurchase->purchaseCount);
-    for (int i = 0; i < genreCount && i < 3; i++) {
-        printf("- %s (%dx)\n", genreFreq[i].genre, genreFreq[i].count);
-    }
+    printf("\n--- Game Recommendations for YOU ---\n");
     
     printf("\n%-5s %-30s %-20s %-10s %s\n", "Rank", "Name", "Genre", "Price", "Why Recommended");
     printf("----------------------------------------------------------------\n");

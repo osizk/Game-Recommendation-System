@@ -20,7 +20,7 @@ void customerMenu(const char *username){
     setCart();
     int input;
     char name[100];
-
+    int c;
     while(1){
         CLEAR_SCREEN();
         printf("\n+-----------------------------+\n");
@@ -54,6 +54,8 @@ void customerMenu(const char *username){
                     } else {
                          printf("\nGame '%s' not found.\n", name);
                     }
+                    printf("\nPress Enter to continue...");
+                    while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 case 2:
                     printf("\n--- Add to Cart ---\n");
@@ -61,6 +63,8 @@ void customerMenu(const char *username){
                     fgets(name, sizeof(name), stdin);
                     name[strcspn(name, "\n")] = '\0';
                     addtoCart(name);
+                    printf("\nPress Enter to continue...");
+                    while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 case 3:
                      printf("\n--- Delete from Cart ---\n");
@@ -68,53 +72,50 @@ void customerMenu(const char *username){
                     fgets(name, sizeof(name), stdin);
                     name[strcspn(name, "\n")] = '\0';
                     deletefromCart(name);
+                    printf("\nPress Enter to continue...");
+                    while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 case 4:
                     viewCart();
+                    printf("\nPress Enter to continue...");
+                    while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 case 5:
                     checkout(username);
+                    printf("\nPress Enter to continue...");
+                    while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 case 6:
                      printf("\n--- Your Purchase History ---\n");
                     display_user_logging(username);
+                    printf("\nPress Enter to continue...");
+                    while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 case 7:
                     recommendBasedOnHistory(username);
-                    int c3;
-                    while ((c3 = getchar()) != '\n' && c3 != EOF);
-                    return;
-                    return;
+                    printf("\nPress Enter to continue...");
+                    while ((c = getchar()) != '\n' && c != EOF);
+                    break;
                 case 8:
                     printf("\nReturning to main menu...\n");
-                    int c;
                     while ((c = getchar()) != '\n' && c != EOF);
                     return;
                     break;
                 default:
                     printf("\nInvalid input. Please try again.\n");
-                     printf("\nPress Enter to continue...");
-                     getchar();
-                      int c2;
-                     while ((c2 = getchar()) != '\n' && c2 != EOF);
+                    printf("\nPress Enter to continue...");
+                    //getchar();
+                    while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 }
             } else {
                 printf("\nInvalid input. Please enter a number.\n");
-                 printf("\nPress Enter to continue...");
-                 int c;
-                 while ((c = getchar()) != '\n' && c != EOF);
+                printf("\nPress Enter to continue...");
+                while ((c = getchar()) != '\n' && c != EOF);
             }
         } else {
             printf("\nError reading input. Returning to main menu.\n");
             return;
         }
-
-         if (input != 7) {
-             printf("\nPress Enter to continue...");
-             getchar();
-             int c;
-             while ((c = getchar()) != '\n' && c != EOF);
-         }
     }
 }
