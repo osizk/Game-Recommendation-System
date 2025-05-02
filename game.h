@@ -38,6 +38,8 @@ typedef struct UserPurchase {
     int purchaseCount;
 } UserPurchase;
 
+void saveGameListToCSV(const char* filename);
+
 unsigned int hash(char name[]);
 void addGame(char name[], char genre[], float price);
 void loadGame(char filename[]);

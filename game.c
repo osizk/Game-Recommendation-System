@@ -20,6 +20,28 @@ unsigned int hash(char name[]) {
     return hash_value % tablesize;
 }
 
+void saveGameListToCSV(const char* filename) {
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Error opening file '%s' for writing!\n", filename);
+        return;
+    }
+
+    fprintf(file, "Name,Genre,Price\n");
+
+    for (int i = 0; i < tablesize; ++i) {
+        game *temp = hashIndex[i];
+        while (temp != NULL) {
+            fprintf(file, "%s,%s,%.2f\n", temp->name, temp->genre, temp->price);
+            temp = temp->next;
+        }
+    }
+
+    fclose(file);
+    printf("Game list saved to '%s'.\n", filename);
+}
+
+
 void addGame(char name[], char genre[], float price) {
     unsigned int index = hash(name);
     game *newNode = malloc(sizeof(game));
@@ -32,6 +54,7 @@ void addGame(char name[], char genre[], float price) {
     strcpy(newNode->genre, genre);
     newNode->price = price;
     newNode->next = NULL;
+    newNode->relationcount = 0;
 
     if (hashIndex[index] == NULL) {
         hashIndex[index] = newNode;
@@ -43,6 +66,8 @@ void addGame(char name[], char genre[], float price) {
         current->next = newNode;
     }
     printf("Game '%s' added successfully.\n", name);
+
+    saveGameListToCSV("games.csv");
 }
 
 
@@ -53,59 +78,90 @@ void loadGame(char filename[]) {
         return;
     }
     char line[256];
+    fgets(line, sizeof(line), file);
+
     while (fgets(line, sizeof(line), file)) {
         char name[99];
         char genre[99];
         float price;
 
         if (sscanf(line, "%[^,],%[^,],%f", name, genre, &price) == 3) {
-            addGame(name, genre, price);
+            unsigned int index = hash(name);
+            game *newNode = malloc(sizeof(game));
+
+            if (newNode == NULL) {
+                printf("Memory allocation failed during loading.\n");
+                continue;
+            }
+            strcpy(newNode->name, name);
+            strcpy(newNode->genre, genre);
+            newNode->price = price;
+            newNode->next = NULL;
+            newNode->relationcount = 0;
+
+            if (hashIndex[index] == NULL) {
+                hashIndex[index] = newNode;
+            } else {
+                game *current = hashIndex[index];
+                while (current->next != NULL) {
+                    current = current->next;
+                }
+                current->next = newNode;
+            }
         } else {
             printf("Skipping malformed line in %s: %s", filename, line);
         }
     }
 
     fclose(file);
+    printf("Game data loaded from '%s'.\n", filename);
 }
 
 void loadRelations(char filename[]) {
     FILE* file = fopen(filename, "r");
     if (!file) {
         perror("Error opening relations file");
+        printf("Warning: Could not load game relations from '%s'.\n", filename);
         return;
     }
-    
+
     char line[256];
     while (fgets(line, sizeof(line), file)) {
-        char game1[100], game2[100];
-        if (sscanf(line, "%[^,],%[^\n]", game1, game2) == 2) {
-            addRelation(game1, game2);
-            addRelation(game2, game1);
+        char game1_name[100], game2_name[100];
+        if (sscanf(line, "%[^,],%[^\n]", game1_name, game2_name) == 2) {
+            addRelation(game1_name, game2_name);
+        } else {
+             printf("Skipping malformed relation line in %s: %s", filename, line);
         }
     }
     fclose(file);
+     printf("Game relations loaded from '%s'.\n", filename);
 }
 
 void printgamelist() {
-    printf("\n--- Game List ---\n");
-    printf("%-30s %-20s %-10s\n", "Name", "Genre", "Price");
-    printf("----------------------------------------------------------\n");
+    printf("\n+--------------------------------------------------+\n");
+    printf("|                   Game List                      |\n");
+    printf("+--------------------------------------------------+\n");
+
+    printf("| %-28s | %-18s | %-8s |\n", "Name", "Genre", "Price");
+    printf("+------------------------------+--------------------+----------+\n");
 
     int game_count = 0;
     for (int i = 0; i < tablesize; ++i) {
         game *temp = hashIndex[i];
         while (temp != NULL) {
-
-            printf("%-30s %-20s %-10.2f\n", temp->name, temp->genre, temp->price);
+            printf("| %-28s | %-18s | %-8.2f |\n", temp->name, temp->genre, temp->price);
             temp = temp->next;
             game_count++;
         }
     }
 
     if (game_count == 0) {
-        printf("No games found in the system.\n");
+        printf("| %-64s |\n", "No games found in the system.");
+         printf("+--------------------------------------------------+\n\n");
+    } else {
+         printf("+------------------------------+--------------------+----------+\n\n");
     }
-    printf("----------------------------------------------------------\n\n");
 }
 
 void removeSpaces(char str[])
@@ -127,7 +183,6 @@ int compareWithoutspaces(char name1[], char name2[]) {
     strcpy(temp2, name2);
     removeSpaces(temp1);
     removeSpaces(temp2);
-    //printf("temp1= %s temp2= %s\n",temp1,temp2);
     return strcasecmp(temp1, temp2);
 }
 
@@ -152,8 +207,11 @@ void editGame(char name[], char newGenre[], float newPrice) {
         gameToEdit->price = newPrice;
         printf("Game '%s' updated successfully.\n", name);
         char editGame[100];
-        snprintf(editGame, sizeof(editGame), "Edit %s  ", name);
+        snprintf(editGame, sizeof(editGame), "Edit %s", name);
         logging_event(editGame,"Admin");
+
+        saveGameListToCSV("games.csv");
+
     } else {
         printf("Game '%s' not found.\n", name);
     }
@@ -177,8 +235,10 @@ void deleteGame(char name[]) {
             free(current);
             printf("Game '%s' deleted successfully.\n", name);
             char deleteGame[100];
-            snprintf(deleteGame, sizeof(deleteGame), "Delete %s  ", name);
+            snprintf(deleteGame, sizeof(deleteGame), "Delete %s", name);
             logging_event(deleteGame,"Admin");
+
+            saveGameListToCSV("games.csv");
 
             return;
         }
@@ -192,11 +252,11 @@ void addRelation(char name1[],char name2[]) {
     game *game1 = findGame(name1);
     game *game2 = findGame(name2);
     if (game1 == NULL) {
-        printf("Game '%s' not found!\n", name1);
+        printf("Warning: Game '%s' not found when adding relation!\n", name1);
         return;
     }
     if (game2 == NULL) {
-        printf("Game '%s' not found!\n", name2);
+        printf("Warning: Game '%s' not found when adding relation!\n", name2);
         return;
     }
     if (game1 == game2){
@@ -204,24 +264,26 @@ void addRelation(char name1[],char name2[]) {
     }
     for (int i=0;i<game1->relationcount;++i) {
         if (game1->related[i] == game2) {
-            printf("Relation already exists between '%s' and '%s'\n", name1, name2);
             return;
         }
     }
     if (game1->relationcount < max_relation) {
         game1->related[game1->relationcount] = game2;
         game1->relationcount++;
-        printf("Added relation: '%s' -> '%s'\n", name1, name2);
     }else{
-        printf("Cannot add more relations to '%s' (maximum reached)\n", name1);
+        printf("Warning: Cannot add more relations to '%s' (maximum reached)\n", name1);
     }
 }
 
 void enqueue(queue **front,queue **rear, game *game){
     queue *newnode = malloc(sizeof(queue));
+    if (newnode == NULL) {
+        printf("Memory allocation failed for queue node.\n");
+        return;
+    }
     newnode->game = game;
     newnode->next = NULL;
-    
+
     if (*front == NULL) {
         *front = newnode;
         *rear = newnode;
@@ -237,7 +299,7 @@ game* dequeue(queue **front, queue **rear) {
     }
     queue *temp = *front;
     game *result = temp->game;
-    
+
     *front = (*front)->next;
     if (*front == NULL) {
         *rear = NULL;
@@ -268,13 +330,15 @@ void BFS(char name[]){
 
     Game->visited = 1;
     enqueue(&front,&rear,Game);
-    printf("Games related to '%s':\n", name);
+    printf("\nGames related to '%s':\n", name);
 
+    int found_related = 0;
     while (front!=NULL) {
         game *current = dequeue(&front,&rear);
-        
+
         if (current != Game) {
             printf("- %s (%s, $%.2f)\n", current->name, current->genre, current->price);
+            found_related = 1;
         }
 
         for (int i = 0; i < current->relationcount && i < max_relation; i++) {
@@ -284,9 +348,19 @@ void BFS(char name[]){
             }
         }
     }
+    if (!found_related) {
+        printf("No direct or indirect related games found.\n");
+    }
 }
 
 void setCart(){
+    CartItem* current = cart.front;
+    CartItem* next;
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
     cart.front = NULL;
     cart.rear = NULL;
     cart.count = 0;
@@ -303,7 +377,20 @@ void addtoCart(char name[]){
         printf("Game '%s' not found!\n", name);
         return;
     }
+    CartItem* current = cart.front;
+    while (current != NULL) {
+        if (compareWithoutspaces(current->game->name, name) == 0) {
+            printf("Game '%s' is already in the cart.\n", name);
+            return;
+        }
+        current = current->next;
+    }
+
     CartItem* newItem = malloc(sizeof(CartItem));
+    if (newItem == NULL) {
+        printf("Memory allocation failed for cart item.\n");
+        return;
+    }
     newItem->game = found;
     newItem->next = NULL;
 
@@ -328,6 +415,7 @@ void deletefromCart(char name[]){
     }
     CartItem *current=cart.front;
     CartItem *prev=NULL;
+    int found = 0;
     while(current!=NULL){
         if(!compareWithoutspaces(current->game->name,name)){
             if(prev==NULL){
@@ -342,30 +430,41 @@ void deletefromCart(char name[]){
             cart.total -= current->game->price;
             printf("Removed from cart: %s\n", current->game->name);
             printf("Cart now has %d items (Total: $%.2f)\n", cart.count, cart.total);
+            free(current);
+            found = 1;
+            break;
         }
         prev = current;
         current = current->next;
     }
+    if (!found) {
+         printf("Game '%s' not found in the cart.\n", name);
+    }
 }
 
 void viewCart(){
-    printf("\n--- Your Shopping Cart ---\n");
+    printf("\n+--------------------------------------------------+\n");
+    printf("|               Your Shopping Cart                 |\n");
+    printf("+--------------------------------------------------+\n");
+
     if(cart.count == 0) {
-        printf("Your cart is empty\n");
+        printf("| %-64s |\n", "Your cart is empty.");
+        printf("+--------------------------------------------------+\n\n");
         return;
     }
-    
-    printf("%-30s %-20s %-10s\n","Game","Genre","Price");
-    printf("-----------------------------------------------------------\n");
-    
+
+    printf("| %-28s | %-18s | %-8s |\n", "Game", "Genre", "Price");
+    printf("+------------------------------+--------------------+----------+\n");
+
     CartItem* current = cart.front;
     while(current != NULL) {
-        printf("%-30s %-20s $%-9.2f\n", current->game->name,current->game->genre,current->game->price);
+        printf("| %-28s | %-18s | %-8.2f |\n", current->game->name,current->game->genre,current->game->price);
         current = current->next;
     }
-    
-    printf("\nTotal: $%.2f\n", cart.total);
-    printf("-----------------------------------------------------------\n");
+
+    printf("+------------------------------+--------------------+----------+\n");
+    printf("| %-55sTotal: $%-8.2f |\n", "", cart.total);
+    printf("+--------------------------------------------------+\n\n");
 }
 
 void checkout(const char *username){
@@ -376,15 +475,18 @@ void checkout(const char *username){
     printf("\n---- Cart Summary ----\n");
     viewCart();
     printf("\nConfirm purchase (y/n): ");
-    char confirm;
-    scanf("%c", &confirm);    
-    if(tolower(confirm) == 'y') {
+    char confirm_str[10];
+    fgets(confirm_str, sizeof(confirm_str), stdin);
+    char confirm = tolower(confirm_str[0]);
+
+    if(confirm == 'y') {
         printf("\nPurchase completed! Thank you!\n");
         printf("Total charged: $%.2f\n", cart.total);
         recordPurchase(username,&cart);
         saveUserPurchaseHistory(username);
+
         CartItem* current = cart.front;
-        while (current != NULL) 
+        while (current != NULL)
         {
             char activity[200];
             snprintf(activity, sizeof(activity), "Purchased Game: %s ($%.2f)",current->game->name, current->game->price);
@@ -401,71 +503,99 @@ void checkout(const char *username){
 void loadUserPurchaseHistory(const char* username) {
     char filename[150];
     snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
-    
+
+    if (currentUserPurchase != NULL) {
+        free(currentUserPurchase);
+        currentUserPurchase = NULL;
+    }
+
     FILE* file = fopen(filename, "r");
     if (!file) {
         currentUserPurchase = malloc(sizeof(UserPurchase));
+        if (currentUserPurchase == NULL) {
+             printf("Memory allocation failed for user purchase history.\n");
+             return;
+        }
         strcpy(currentUserPurchase->username, username);
         currentUserPurchase->purchaseCount = 0;
         return;
     }
-    
+
     currentUserPurchase = malloc(sizeof(UserPurchase));
+     if (currentUserPurchase == NULL) {
+        printf("Memory allocation failed for user purchase history.\n");
+        fclose(file);
+        return;
+    }
     strcpy(currentUserPurchase->username, username);
     currentUserPurchase->purchaseCount = 0;
-    
+
     char line[256];
     fgets(line, sizeof(line), file);
-    
+
     while (fgets(line, sizeof(line), file) && currentUserPurchase->purchaseCount < max_cart) {
         char name[100], genre[100], date[20];
         float price;
-        
-        if (sscanf(line, "\"%[^\"]\",\"%[^\"]\",%f,%19s", 
+
+        if (sscanf(line, "\"%[^\"]\",\"%[^\"]\",%f,%19s",
                   name, genre, &price, date) == 4) {
-            
+
             game* purchasedGame = findGame(name);
             if (purchasedGame) {
                 currentUserPurchase->purchasedGames[currentUserPurchase->purchaseCount] = purchasedGame;
                 currentUserPurchase->purchaseCount++;
+            } else {
+                 printf("Warning: Purchased game '%s' not found in current game list.\n", name);
             }
+        } else {
+             printf("Warning: Skipping malformed purchase history line for user %s: %s", username, line);
         }
     }
-    
+
     fclose(file);
 }
 
 void saveUserPurchaseHistory(const char* username) {
-    if (!currentUserPurchase) return;
-    
+    if (!currentUserPurchase || currentUserPurchase->purchaseCount == 0) {
+         char filename[100];
+         snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
+         remove(filename);
+         return;
+    }
+
     char filename[100];
     snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
-    
-    FILE* newFile = fopen("temp.csv", "w");
-    
+
+    FILE* newFile = fopen("temp_history.csv", "w");
+
     if (!newFile) {
-        printf("Error creating temporary file\n");
+        printf("Error creating temporary history file\n");
         return;
     }
-    
-    fprintf(newFile, "Game,Genre,Price,PurchaseDate\n");
-    
+
+    fprintf(newFile, "\"Game\",\"Genre\",\"Price\",\"PurchaseDate\"\n");
+
     time_t now = time(NULL);
     struct tm* tm_info = localtime(&now);
     char date_str[20];
     strftime(date_str, sizeof(date_str), "%Y-%m-%d", tm_info);
-    
+
     for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
         if (currentUserPurchase->purchasedGames[i] != NULL) {
-            fprintf(newFile, "\"%s\",\"%s\",%.2f,%s\n",currentUserPurchase->purchasedGames[i]->name,currentUserPurchase->purchasedGames[i]->genre,currentUserPurchase->purchasedGames[i]->price,date_str);
+            fprintf(newFile, "\"%s\",\"%s\",%.2f,%s\n",
+                    currentUserPurchase->purchasedGames[i]->name,
+                    currentUserPurchase->purchasedGames[i]->genre,
+                    currentUserPurchase->purchasedGames[i]->price,
+                    date_str);
         }
     }
-    
+
     fclose(newFile);
-    
+
     remove(filename);
-    rename("temp.csv", filename);
+    rename("temp_history.csv", filename);
 }
+
 
 void recordPurchase(const char* username, Cart* cart) {
     if (!currentUserPurchase) {
@@ -478,18 +608,22 @@ void recordPurchase(const char* username, Cart* cart) {
     while (item != NULL && currentUserPurchase->purchaseCount < max_cart) {
         int alreadyPurchased = 0;
         for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
-            if (compareWithoutspaces(currentUserPurchase->purchasedGames[i]->name, item->game->name) == 0) {
+            if (currentUserPurchase->purchasedGames[i] != NULL &&
+                compareWithoutspaces(currentUserPurchase->purchasedGames[i]->name, item->game->name) == 0) {
                 alreadyPurchased = 1;
                 break;
             }
         }
-        
+
         if (!alreadyPurchased) {
             currentUserPurchase->purchasedGames[currentUserPurchase->purchaseCount] = item->game;
             currentUserPurchase->purchaseCount++;
         }
-        
+
         item = item->next;
+    }
+     if (cart->count > 0 && currentUserPurchase->purchaseCount >= max_cart) {
+        printf("Warning: Purchase history is full. Could not record all purchased games.\n");
     }
 }
 
