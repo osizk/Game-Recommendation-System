@@ -43,6 +43,7 @@ void addGame(char name[], char genre[], float price) {
         current->next = newNode;
     }
     printf("Game '%s' added successfully.\n", name);
+    saveGamelist("games.csv");
 }
 
 
@@ -154,10 +155,12 @@ void editGame(char name[], char newGenre[], float newPrice) {
         char editGame[100];
         snprintf(editGame, sizeof(editGame), "Edit %s  ", name);
         logging_event(editGame,"Admin");
+        saveGamelist("games.csv");
     } else {
         printf("Game '%s' not found.\n", name);
     }
 }
+
 void deleteGame(char name[]) {
     unsigned int index = hash(name);
     game *current = hashIndex[index];
@@ -179,6 +182,7 @@ void deleteGame(char name[]) {
             char deleteGame[100];
             snprintf(deleteGame, sizeof(deleteGame), "Delete %s  ", name);
             logging_event(deleteGame,"Admin");
+            saveGamelist("games.csv");
 
             return;
         }
@@ -187,7 +191,6 @@ void deleteGame(char name[]) {
     }
     printf("Game '%s' not found.\n", name);
 }
-
 void addRelation(char name1[],char name2[]) {
     game *game1 = findGame(name1);
     game *game2 = findGame(name2);
@@ -494,4 +497,23 @@ void recordPurchase(const char* username, Cart* cart) {
         
         item = item->next;
     }
+}
+
+void saveGamelist(const char* filename) {
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Error opening file '%s' for writing!\n", filename);
+        return;
+    }
+
+    for (int i = 0; i < tablesize; ++i) {
+        game *temp = hashIndex[i];
+        while (temp != NULL) {
+            fprintf(file, "%s,%s,%.2f\n", temp->name, temp->genre, temp->price);
+            temp = temp->next;
+        }
+    }
+
+    fclose(file);
+    printf("Game list saved to '%s'.\n", filename);
 }

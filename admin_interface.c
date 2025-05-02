@@ -77,13 +77,13 @@ void adminMenu() {
                 deleteGame(name);
 
                 break;
-            case 4:
-
+            case 4: { // Add opening curly brace here
                 char date[11];
-                printf("Select Date (format: YYYY-MM-DD): ");
+                printf("Select Date (format:YYYY-MM-DD): ");
                 scanf("%10s", date);
                 display_logging(date);
                 break;
+            } // Add closing curly brace here
             case 5:
                 printf("Game list is shown above.\n");
                 break;

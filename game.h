@@ -62,4 +62,5 @@ void checkout(const char *username);
 void loadUserPurchaseHistory(const char* username);
 void saveUserPurchaseHistory(const char* username);
 void recordPurchase(const char* username, Cart* cart);
+void saveGamelist(const char* filename);
 #endif
