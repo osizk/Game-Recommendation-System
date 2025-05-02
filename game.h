@@ -3,7 +3,7 @@
 
 #define tablesize 20
 #define max_relation 100
-#define max_cart 20
+#define max_cart 100
 
 typedef struct game{
     char name[99];
@@ -34,9 +34,8 @@ typedef struct {
 
 typedef struct UserPurchase {
     char username[100];
-    game* purchasedGames[max_cart];  // Track purchased games
+    game* purchasedGames[max_cart];
     int purchaseCount;
-    struct UserPurchase* next;
 } UserPurchase;
 
 unsigned int hash(char name[]);
@@ -53,7 +52,7 @@ void addRelation(char name1[],char name2[]);
 void enqueue(queue **front,queue **rear, game *game);
 game* dequeue(queue **front,queue **rear);
 void setVisited();
-void BFS(char name[]);
+void BFS(char name[]); //not use
 void setCart();
 void addtoCart(char name[]);
 void deletefromCart(char name[]);
@@ -62,4 +61,5 @@ void checkout(const char *username);
 void loadUserPurchaseHistory(const char* username);
 void saveUserPurchaseHistory(const char* username);
 void recordPurchase(const char* username, Cart* cart);
+void recommendBasedOnHistory(const char* username);
 #endif

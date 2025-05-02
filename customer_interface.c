@@ -16,7 +16,8 @@ void customerMenu(const char *username){
         printf("[4] View cart\n");
         printf("[5] Checkout\n");
         printf("[6] View History\n");
-        printf("[7] Exit\n");
+        printf("[7] Recommend game\n");
+        printf("[8] Exit\n");
         printf("Enter your choice: ");
         scanf("%d",&input);
         while(getchar() != '\n');
@@ -53,6 +54,9 @@ void customerMenu(const char *username){
             display_user_logging(username);
             break;
         case 7:
+            recommendBasedOnHistory(username);
+            break;
+        case 8:
             x=0;
             break;
         default:

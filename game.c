@@ -407,14 +407,12 @@ void loadUserPurchaseHistory(const char* username) {
         currentUserPurchase = malloc(sizeof(UserPurchase));
         strcpy(currentUserPurchase->username, username);
         currentUserPurchase->purchaseCount = 0;
-        currentUserPurchase->next = NULL;
         return;
     }
     
     currentUserPurchase = malloc(sizeof(UserPurchase));
     strcpy(currentUserPurchase->username, username);
     currentUserPurchase->purchaseCount = 0;
-    currentUserPurchase->next = NULL;
     
     char line[256];
     fgets(line, sizeof(line), file);
@@ -474,7 +472,6 @@ void recordPurchase(const char* username, Cart* cart) {
         currentUserPurchase = malloc(sizeof(UserPurchase));
         strcpy(currentUserPurchase->username, username);
         currentUserPurchase->purchaseCount = 0;
-        currentUserPurchase->next = NULL;
     }
     loadUserPurchaseHistory(username);
     CartItem* item = cart->front;
@@ -494,4 +491,153 @@ void recordPurchase(const char* username, Cart* cart) {
         
         item = item->next;
     }
+}
+
+void recommendBasedOnHistory(const char* username) {
+    if (currentUserPurchase == NULL || strcmp(currentUserPurchase->username, username) != 0) {
+        loadUserPurchaseHistory(username);
+    }
+    if (currentUserPurchase->purchaseCount == 0) {
+        printf("No purchase history found for %s. Try browsing our catalog!\n", username);
+        return;
+    }
+    setVisited();
+    
+    typedef struct {
+        char genre[99];
+        int count;
+    } GenreFrequency;
+    
+    GenreFrequency genreFreq[20] = {0};
+    int genreCount = 0;
+    
+    for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
+        //game* purchased = currentUserPurchase->purchasedGames[i];
+        
+        // find genre frequency
+        int found = 0;
+        for (int j = 0; j < genreCount; j++) {
+            if (strcmp(genreFreq[j].genre, currentUserPurchase->purchasedGames[i]->genre) == 0) {
+                genreFreq[j].count++;
+                found = 1;
+                break;
+            }
+        }
+        if (!found && genreCount < 20) {
+            strcpy(genreFreq[genreCount].genre, currentUserPurchase->purchasedGames[i]->genre);
+            genreFreq[genreCount].count = 1;
+            genreCount++;
+        }
+    }
+    
+    // Sort genres by frequency (bubble sort)
+    for (int i = 0; i < genreCount - 1; i++) {
+        for (int j = 0; j < genreCount - i - 1; j++) {
+            if (genreFreq[j].count < genreFreq[j+1].count) {
+                GenreFrequency temp = genreFreq[j];
+                genreFreq[j] = genreFreq[j+1];
+                genreFreq[j+1] = temp;
+            }
+        }
+    }
+    
+    // Find recommended games (BFS from all purchased games)
+    queue* front = NULL;
+    queue* rear = NULL;
+    
+    // Mark all purchased games as visited (distance 0)
+    for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
+        game* purchased = currentUserPurchase->purchasedGames[i];
+        purchased->visited = 1;
+        enqueue(&front, &rear, purchased);
+    }
+    
+    // Track recommendations with their distance and genre match score
+    typedef struct {
+        game* game;
+        int distance;
+        int genreScore;
+    } Recommendation;
+    
+    Recommendation recommendations[max_relation * 2];
+    int recCount = 0;
+    
+    //BFS
+    while (front != NULL) {
+        game* current = dequeue(&front, &rear);
+        int currentDistance = current->visited - 1;//game that owned distance will be 0
+        
+        if (currentDistance > 0) {
+            int genreScore = 0;
+            for (int i = 0; i < genreCount; i++) {
+                if (strcmp(current->genre, genreFreq[i].genre) == 0) {
+                    genreScore = genreCount - i; // Higher score for more frequent genres
+                    break;
+                }
+            }
+            
+            recommendations[recCount].game = current;
+            recommendations[recCount].distance = currentDistance;
+            recommendations[recCount].genreScore = genreScore;
+            recCount++;
+        }
+        for (int i = 0; i < current->relationcount && i < max_relation; i++) {
+            if (current->related[i] != NULL && !current->related[i]->visited) {
+                current->related[i]->visited = current->visited + 1;
+                enqueue(&front, &rear, current->related[i]);
+            }
+        }
+    }
+    
+    // Sort by genre score (primary) and distance (secondary)
+    for (int i = 0; i < recCount - 1; i++) {
+        for (int j = 0; j < recCount - i - 1; j++) {
+            if (recommendations[j].genreScore < recommendations[j+1].genreScore || 
+                (recommendations[j].genreScore == recommendations[j+1].genreScore && 
+                 recommendations[j].distance > recommendations[j+1].distance)) {
+                Recommendation temp = recommendations[j];
+                recommendations[j] = recommendations[j+1];
+                recommendations[j+1] = temp;
+            }
+        }
+    }
+    
+    // Display
+    printf("\n--- Personalized Recommendations for %s ---\n", username);
+    printf("Based on your %d purchased games in these genres:\n", currentUserPurchase->purchaseCount);
+    for (int i = 0; i < genreCount && i < 3; i++) {
+        printf("- %s (%dx)\n", genreFreq[i].genre, genreFreq[i].count);
+    }
+    
+    printf("\n%-5s %-30s %-20s %-10s %s\n", "Rank", "Name", "Genre", "Price", "Why Recommended");
+    printf("----------------------------------------------------------------\n");
+    
+    int maxToShow = 5;
+    for (int i = 0; i < recCount && i < maxToShow; i++) {
+        char reason[100];
+        if (recommendations[i].genreScore > 0) {
+            snprintf(reason, sizeof(reason), "Matches your preferred genres");
+        } else {
+            snprintf(reason, sizeof(reason), "Related to your purchases (%d degree%s)", 
+                    recommendations[i].distance,
+                    recommendations[i].distance == 1 ? "" : "s");
+        }
+        
+        printf("%-5d %-30s %-20s $%-9.2f %s\n", 
+               i+1, 
+               recommendations[i].game->name, 
+               recommendations[i].game->genre, 
+               recommendations[i].game->price,
+               reason);
+    }
+    
+    if (recCount == 0) {
+        printf("No recommendations found. Try browsing our new releases!\n");
+    }
+    
+    printf("----------------------------------------------------------------\n");
+    
+    char logMessage[200];
+    snprintf(logMessage, sizeof(logMessage), "Viewed personalized recommendations");
+    logging_user(logMessage, username);
 }
