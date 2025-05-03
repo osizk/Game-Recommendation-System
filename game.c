@@ -13,6 +13,7 @@ Cart cart;
 
 unsigned int hash(char name[]) {
     unsigned int hash_value = 0;
+    removeSpaces(name);
     while (*name) {
         hash_value = (hash_value * 21) + tolower(*name);
         name++;
@@ -20,7 +21,7 @@ unsigned int hash(char name[]) {
     return hash_value % tablesize;
 }
 
-void saveGameListToCSV(const char* filename) {
+void saveGameToCSV(char filename[]) {
     FILE* file = fopen(filename, "w");
     if (file == NULL) {
         printf("Error opening file '%s' for writing!\n", filename);
@@ -67,7 +68,7 @@ void addGame(char name[], char genre[], float price) {
     }
     printf("Game '%s' added successfully.\n", name);
 
-    saveGameListToCSV("games.csv");
+    saveGameToCSV("games.csv");
 }
 
 
@@ -120,7 +121,7 @@ void loadGame(char filename[]) {
 void loadRelations(char filename[]) {
     FILE* file = fopen(filename, "r");
     if (!file) {
-        perror("Error opening relations file");
+        printf("Error opening relations file");
         printf("Warning: Could not load game relations from '%s'.\n", filename);
         return;
     }
@@ -210,7 +211,7 @@ void editGame(char name[], char newGenre[], float newPrice) {
         snprintf(editGame, sizeof(editGame), "Edit %s", name);
         logging_event(editGame,"Admin");
 
-        saveGameListToCSV("games.csv");
+        saveGameToCSV("games.csv");
 
     } else {
         printf("Game '%s' not found.\n", name);
@@ -238,7 +239,7 @@ void deleteGame(char name[]) {
             snprintf(deleteGame, sizeof(deleteGame), "Delete %s", name);
             logging_event(deleteGame,"Admin");
 
-            saveGameListToCSV("games.csv");
+            saveGameToCSV("games.csv");
 
             return;
         }
@@ -686,7 +687,6 @@ void recommendBasedOnHistory(const char* username) {
         enqueue(&front, &rear, purchased);
     }
     
-    // Track recommendations with their distance and genre match score
     typedef struct {
         game* game;
         int distance;

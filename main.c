@@ -33,10 +33,9 @@ int main() {
     int c;
     int choice;
     char username[100];
-
+    
     while (1) {
         displayMainMenu();
-
         char input_str[10];
         if (fgets(input_str, sizeof(input_str), stdin) != NULL) {
             if (sscanf(input_str, "%d", &choice) == 1) {

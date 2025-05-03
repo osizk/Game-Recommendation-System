@@ -10,11 +10,7 @@
 #else
 #define CLEAR_SCREEN() system("clear")
 #endif
-#ifdef _WIN32
-#define CLEAR_SCREEN() system("cls")
-#else
-#define CLEAR_SCREEN() system("clear")
-#endif
+
 
 void customerMenu(const char *username){
     setCart();
@@ -67,8 +63,8 @@ void customerMenu(const char *username){
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 case 3:
-                     printf("\n--- Delete from Cart ---\n");
-                     printf("Enter game to delete from cart: ");
+                    printf("\n--- Delete from Cart ---\n");
+                    printf("Enter game to delete from cart: ");
                     fgets(name, sizeof(name), stdin);
                     name[strcspn(name, "\n")] = '\0';
                     deletefromCart(name);
