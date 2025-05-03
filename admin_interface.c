@@ -88,7 +88,7 @@ void adminMenu() {
                                 break;
                             }
 
-                            editGame(name, newGenre, newPrice);  // ❗ อย่าลืมเอา logging ออกจาก editGame()
+                            editGame(name, newGenre, newPrice);
                             char editGameLog[100];
                             snprintf(editGameLog, sizeof(editGameLog), "Edit %s", name);
                             logging_event(editGameLog, "Admin");
