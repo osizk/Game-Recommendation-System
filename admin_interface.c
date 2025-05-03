@@ -31,7 +31,7 @@ void adminMenu() {
         printf("| [2] Edit Game               |\n");
         printf("| [3] Delete Game             |\n");
         printf("| [4] Watch Logging           |\n");
-        printf("| [5] View Game List          |\n");
+        printf("| [5] Add relation            |\n");
         printf("| [6] Back to Main Menu       |\n");
         printf("+-----------------------------+\n");
         printf("Enter your choice: ");
@@ -89,9 +89,6 @@ void adminMenu() {
                             }
 
                             editGame(name, newGenre, newPrice);
-                            char editGameLog[100];
-                            snprintf(editGameLog, sizeof(editGameLog), "Edit %s", name);
-                            logging_event(editGameLog, "Admin");
                         } else {
                             printf("Game '%s' not found.\n", name);
                         }
@@ -108,9 +105,6 @@ void adminMenu() {
 
                         if (findGame(name)) {
                             deleteGame(name);
-                            char deleteGameLog[100];
-                            snprintf(deleteGameLog, sizeof(deleteGameLog), "Delete %s", name);
-                            logging_event(deleteGameLog, "Admin");
                         } else {
                             printf("Game '%s' not found.\n", name);
                         }
@@ -125,20 +119,23 @@ void adminMenu() {
                         printf("Select Date (format: YYYY-MM-DD): ");
                         fgets(date, sizeof(date), stdin);
                         date[strcspn(date, "\n")] = 0;
-
+                        CLEAR_SCREEN();
                         display_logging(date);
-                        printf("\nPress Enter to continue");
+                        printf("Press Enter to continue...");
                         getchar();                
                         while (getchar() != '\n');  
-                        CLEAR_SCREEN();
                         break;
 
                     case 5:
-                        printf("\nPress Enter to continue and view the game list...");
-                        while (getchar() != '\n');
-                        CLEAR_SCREEN();
-                        printgamelist();
-                        printf("\nPress Enter to return to the Admin Menu...");
+                        char name1[99],name2[99];
+                        printf("\nEnter the name of the game to add relation\n");
+                        printf("Name of game[1]: ");
+                        fgets(name1, sizeof(name), stdin);
+                        printf("Name of game[2]: ");
+                        fgets(name2, sizeof(name), stdin);
+                        addRelation(name1,name2);
+                        addRelation(name2,name1);
+                        printf("\nPress Enter to continue...");
                         while (getchar() != '\n');
                         break;
 
