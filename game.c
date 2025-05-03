@@ -492,7 +492,7 @@ void checkout(const char *username){
         {
             char activity[200];
             snprintf(activity, sizeof(activity), "Purchased Game: %s ($%.2f)",current->game->name, current->game->price);
-            logging_user(activity, username);
+            logging_event(activity, username);
             current = current->next;
         }
 
@@ -756,7 +756,7 @@ void recommendBasedOnHistory(const char* username) {
     
     char logMessage[200];
     snprintf(logMessage, sizeof(logMessage), "Viewed personalized recommendations");
-    logging_user(logMessage, username);
+    logging_event(logMessage, username);
 }
 
 void printPurchaseHistory(const char* username) {
