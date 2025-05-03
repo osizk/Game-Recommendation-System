@@ -771,3 +771,27 @@ void recommendBasedOnHistory(const char* username) {
     snprintf(logMessage, sizeof(logMessage), "Viewed personalized recommendations");
     logging_user(logMessage, username);
 }
+
+void display_user_History(const char *user)
+{
+    char filename[256];
+    CreateLogUser(filename, sizeof(filename), user);
+
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL)
+    {
+        printf("\n---- User History: %s ----\n", user);
+        printf("---- End of User History ----\n\n");
+        return;
+    }
+
+    char line[512];
+    printf("\n---- User History: %s ----\n", user);
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
+        printf("%s", line);
+    }
+    printf("---- End of User History ----\n\n");
+
+    fclose(fp);
+}
