@@ -50,7 +50,7 @@ int compareWithoutspaces(char name1[], char name2[]);
 game *findGame(char name[]);
 void editGame(char name[], char newGenre[], float newPrice);
 void deleteGame(char name[]);
-void addRelation(char name1[],char name2[]);
+void addRelation(char name1[], char name2[], int writeToFile);
 void enqueue(queue **front,queue **rear, game *game);
 game* dequeue(queue **front,queue **rear);
 void setVisited();
