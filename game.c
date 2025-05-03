@@ -129,7 +129,7 @@ void loadRelations(char filename[]) {
     while (fgets(line, sizeof(line), file)) {
         char game1_name[100], game2_name[100];
         if (sscanf(line, "%[^,],%[^\n]", game1_name, game2_name) == 2) {
-            addRelation(game1_name, game2_name);
+            addRelation(game1_name, game2_name,0);
         } else {
             printf("⚠️ Skipping malformed line: %s", line);
         }
@@ -255,31 +255,45 @@ void addRelation(char name1[], char name2[], int writeToFile) {
     game *game2 = findGame(name2);
 
     if (!game1 || !game2) {
-        printf("One or both games not found.\n");
+        printf(" One or both games not found.\n");
         return;
     }
 
     if (game1 == game2) {
-        printf("Cannot relate a game to itself.\n");
+        printf(" Cannot relate a game to itself.\n");
         return;
     }
 
     for (int i = 0; i < game1->relationcount; ++i) {
         if (game1->related[i] == game2) {
             if (writeToFile) {
-                printf("Relation already exists: %s <-> %s\n", name1, name2);
+                printf("⚠️ Relation already exists: %s <-> %s\n", name1, name2);
             }
             return;
         }
     }
 
     if (game1->relationcount < max_relation) {
-        game1->related[game1->relationcount] = game2;
-        game1->relationcount++;
-    }else{
-        printf("Warning: Cannot add more relations to '%s' (maximum reached)\n", name1);
+        game1->related[game1->relationcount++] = game2;
+
+        if (writeToFile) {
+            FILE *fp = fopen("relations.csv", "a");
+            if (fp != NULL) {
+                fprintf(fp, "%s,%s\n", name1, name2);
+                fclose(fp);
+            }
+
+            char logMsg[200];
+            snprintf(logMsg, sizeof(logMsg), "Relation added: %s <-> %s", name1, name2);
+            logging_event(logMsg, "Admin");
+
+            printf("✅ Relation added: %s <-> %s\n", name1, name2);
+        }
+    } else {
+        printf("⚠️ Max relation reached for '%s'\n", name1);
     }
 }
+
 
 
 
