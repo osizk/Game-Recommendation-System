@@ -22,10 +22,7 @@ int user_login(char *username) {
 
     FILE *file = fopen("users.csv", "r");
     if (file == NULL) {
-        perror("Error opening users file");
-        printf("User login is currently unavailable.\n");
-        printf("\nPress Enter to continue...");
-        getchar();
+        printf("file not found");
         return 0;
     }
 
@@ -81,10 +78,7 @@ int admin_login() {
 
     FILE *file = fopen("admin.csv", "r");
     if (file == NULL) {
-        perror("Error opening admin file");
-         printf("Admin login is currently unavailable.\n");
-          printf("\nPress Enter to continue...");
-          getchar();
+        printf("file not found");
         return 0;
     }
 

@@ -64,5 +64,5 @@ void loadUserPurchaseHistory(const char* username);
 void saveUserPurchaseHistory(const char* username);
 void recordPurchase(const char* username, Cart* cart);
 void recommendBasedOnHistory(const char* username);
-void display_user_History(const char *user)
+void printPurchaseHistory(const char* username);
 #endif

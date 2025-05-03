@@ -108,21 +108,24 @@ void adminMenu() {
                         name[strcspn(name, "\n")] = 0;
 
                         deleteGame(name);
-
                         break;
-                    case 4:
-                        {
+                        case 4:
                             char date[11];
                             printf("\n--- Watch System Logging ---\n");
                             printf("Select Date (format:YYYY-MM-DD): ");
+
                             if (fgets(date, sizeof(date), stdin) != NULL) {
                                 date[strcspn(date, "\n")] = 0;
+                                printf("%s",date);
                                 display_logging(date);
+                                
+                                printf("\nPress Enter to continue...");
+                                getchar();
                             } else {
                                 printf("Error reading date input.\n");
                             }
-                        }
-                        break;
+                            break;
+
                     case 5:
                         printf("\nPress Enter to continue and view the game list...");
                         int c;

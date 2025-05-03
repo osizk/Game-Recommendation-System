@@ -465,7 +465,7 @@ void viewCart(){
     }
 
     printf("+------------------------------+--------------------+----------+\n");
-    printf("|Total: $%.2f                                                  |\n", cart.total);
+    printf("|Total: $%-54.2f|\n", cart.total);
     printf("+--------------------------------------------------------------+\n\n");
 }
 
@@ -625,7 +625,7 @@ void recordPurchase(const char* username, Cart* cart) {
         item = item->next;
     }
      if (cart->count > 0 && currentUserPurchase->purchaseCount >= max_cart) {
-        printf("Warning: Purchase history is full. Could not record all purchased games.\n");
+        printf("Purchase history is full.\n");
     }
 }
 
@@ -635,7 +635,7 @@ void recommendBasedOnHistory(const char* username) {
         loadUserPurchaseHistory(username);
     }
     if (currentUserPurchase->purchaseCount == 0) {
-        printf("No purchase history found for %s. Try browsing our catalog!\n", username);
+        printf("No recommendation now. Try to buy some games.\n");
         return;
     }
     setVisited();
@@ -737,61 +737,64 @@ void recommendBasedOnHistory(const char* username) {
     }
     
     // Display
-    printf("\n--- Game Recommendations for YOU ---\n");
-    
-    printf("\n%-5s %-30s %-20s %-10s %s\n", "Rank", "Name", "Genre", "Price", "Why Recommended");
-    printf("----------------------------------------------------------------\n");
+    printf("+--------------------------------------------------------------+\n");
+    printf("|                     Game Recommendations                     |\n");
+    printf("+------------------------------+-------------------+-----------+\n");
+    printf("|%-30s|%-20s|%-10s|\n", "Name", "Genre", "Price");
+    printf("+------------------------------+-------------------+-----------+\n");
     
     int maxToShow = 5;
     for (int i = 0; i < recCount && i < maxToShow; i++) {
-        char reason[100];
-        if (recommendations[i].genreScore > 0) {
-            snprintf(reason, sizeof(reason), "Matches your preferred genres");
-        } else {
-            snprintf(reason, sizeof(reason), "Related to your purchases (%d degree%s)", 
-                    recommendations[i].distance,
-                    recommendations[i].distance == 1 ? "" : "s");
-        }
-        
-        printf("%-5d %-30s %-20s $%-9.2f %s\n", 
-               i+1, 
-               recommendations[i].game->name, 
-               recommendations[i].game->genre, 
-               recommendations[i].game->price,
-               reason);
+        printf("|%-30s|%-20s|$%-9.2f|\n", recommendations[i].game->name, recommendations[i].game->genre, recommendations[i].game->price);
     }
     
     if (recCount == 0) {
-        printf("No recommendations found. Try browsing our new releases!\n");
+        printf("No recommendations found.\n");
     }
     
-    printf("----------------------------------------------------------------\n");
+    printf("+--------------------------------------------------------------+\n");
     
     char logMessage[200];
     snprintf(logMessage, sizeof(logMessage), "Viewed personalized recommendations");
     logging_user(logMessage, username);
 }
 
-void display_user_History(const char *user)
-{
-    char filename[256];
-    CreateLogUser(filename, sizeof(filename), user);
-
-    FILE *fp = fopen(filename, "r");
-    if (fp == NULL)
-    {
-        printf("\n---- User History: %s ----\n", user);
-        printf("---- End of User History ----\n\n");
+void printPurchaseHistory(const char* username) {
+    system("cls");
+    char filename[150];
+    snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
+    
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        printf("No purchase history found for %s\n", username);
         return;
     }
+    printf("+---------------------------------------------------------------------------+\n");
+    printf("|                              Purchase History                             |\n");
+    printf("+------------------------------+--------------------+----------+------------+\n");
+    printf("|%-30s|%-20s|%-10s|%-12s|\n", "Game", "Genre", "Price", "Date");
+    printf("+------------------------------+--------------------+----------+------------+\n");
 
-    char line[512];
-    printf("\n---- User History: %s ----\n", user);
-    while (fgets(line, sizeof(line), fp) != NULL)
-    {
-        printf("%s", line);
+    char line[256];
+    fgets(line, sizeof(line), file);
+    
+    float totalSpent = 0.0f;
+    int purchaseCount = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        char name[100], genre[100], date[20];
+        float price;
+        
+        if (sscanf(line, "\"%[^\"]\",\"%[^\"]\",%f,%19s", name, genre, &price, date) == 4) {
+            printf("|%-30s|%-20s|$%-9.2f|%-12s|\n", name, genre, price, date);
+            totalSpent += price;
+            purchaseCount++;
+        }
     }
-    printf("---- End of User History ----\n\n");
 
-    fclose(fp);
+    printf("+---------------------------------------------------------------------------+\n");
+    printf("|Total purchases: %-58d|\n", purchaseCount);
+    printf("|Total spent: $%-61.2f|\n", totalSpent);
+    printf("+---------------------------------------------------------------------------+\n");
+    fclose(file);
 }

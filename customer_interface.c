@@ -12,13 +12,14 @@
 #endif
 
 
-void customerMenu(const char *username){
+void customerMenu( char username[]){
     setCart();
     int input;
     char name[100];
     int c;
     while(1){
         CLEAR_SCREEN();
+        printgamelist();
         printf("\n+-----------------------------+\n");
         printf("|       Customer Menu         |\n");
         printf("+-----------------------------+\n");
@@ -83,7 +84,7 @@ void customerMenu(const char *username){
                     break;
                 case 6:
                     printf("\n--- Your Purchase History ---\n");
-                    display_user_History(username);
+                    printPurchaseHistory(username);
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;

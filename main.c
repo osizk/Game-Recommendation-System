@@ -42,12 +42,9 @@ int main() {
                 switch (choice) {
                     case 1:
                         if (admin_login()) {
-                            printf("\nAdmin login successful!\n");
-                            printf("Press Enter to continue...");
-                            while ((c = getchar()) != '\n' && c != EOF);
                             adminMenu();
                         } else {
-                            printf("\nAdmin login failed.\n");
+                            printf("\nlogin failed.\n");
                             printf("Press Enter to continue...");
                             while ((c = getchar()) != '\n' && c != EOF);
                         }
@@ -56,12 +53,9 @@ int main() {
                         int c3;
                         while ((c3 = getchar()) != '\n' && c3 != EOF);
                         if (user_login(username)) {
-                            printf("\nWelcome, %s!\n", username);
-                            printf("Press Enter to continue...");
-                            while ((c = getchar()) != '\n' && c != EOF);
                             customerMenu(username);
                         } else {
-                            printf("\nUser login failed.\n");
+                            printf("\nlogin failed.\n");
                             printf("Press Enter to continue...");
                             while ((c = getchar()) != '\n' && c != EOF);
                         }
