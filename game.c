@@ -131,6 +131,7 @@ void loadRelations(char filename[]) {
         char game1_name[100], game2_name[100];
         if (sscanf(line, "%[^,],%[^\n]", game1_name, game2_name) == 2) {
             addRelation(game1_name, game2_name);
+            addRelation(game2_name, game1_name);
         } else {
              printf("Skipping malformed relation line in %s: %s", filename, line);
         }
@@ -272,7 +273,7 @@ void addRelation(char name1[],char name2[]) {
         game1->related[game1->relationcount] = game2;
         game1->relationcount++;
     }else{
-        printf("Warning: Cannot add more relations to '%s' (maximum reached)\n", name1);
+        printf("Cannot add more relations to '%s'\n", name1);
     }
 }
 
