@@ -127,8 +127,10 @@ void adminMenu() {
                         date[strcspn(date, "\n")] = 0;
 
                         display_logging(date);
-                        printf("\nPress Enter to continue...");
-                        while (getchar() != '\n');
+                        printf("\nPress Enter to return to the Admin Menu...");
+                        getchar();                
+                        while (getchar() != '\n');  
+                        CLEAR_SCREEN();
                         break;
 
                     case 5:
