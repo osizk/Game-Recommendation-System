@@ -129,8 +129,7 @@ void loadRelations(char filename[]) {
     while (fgets(line, sizeof(line), file)) {
         char game1_name[100], game2_name[100];
         if (sscanf(line, "%[^,],%[^\n]", game1_name, game2_name) == 2) {
-            addRelation(game1_name, game2_name, 0); 
-            addRelation(game2_name, game1_name, 0);
+            addRelation(game1_name, game2_name);
         } else {
             printf("⚠️ Skipping malformed line: %s", line);
         }
@@ -275,23 +274,10 @@ void addRelation(char name1[], char name2[], int writeToFile) {
     }
 
     if (game1->relationcount < max_relation) {
-        game1->related[game1->relationcount++] = game2;
-    } else {
-        printf("Max relation reached for '%s'\n", name1);
-        return;
-    }
-
-    if (writeToFile) {
-        FILE *fp = fopen("relations.csv", "a");
-        if (fp != NULL) {
-            fprintf(fp, "\n%s,%s\n", name1, name2);
-            fclose(fp);
-        }
-
-        char logMsg[200];
-        snprintf(logMsg, sizeof(logMsg), "Relation added: %s <-> %s", name1, name2);
-        logging_event(logMsg, "Admin");
-        printf("Relation added: %s <-> %s\n", name1, name2);
+        game1->related[game1->relationcount] = game2;
+        game1->relationcount++;
+    }else{
+        printf("Warning: Cannot add more relations to '%s' (maximum reached)\n", name1);
     }
 }
 

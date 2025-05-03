@@ -128,25 +128,11 @@ void adminMenu() {
                         break;
 
                     case 5:
-                        printf("\n--- Add Relation Between Games ---\n");
-                    
-                        printf("Name of game [1]: ");
-                        fgets(name1, sizeof(name1), stdin);
-                        name1[strcspn(name1, "\n")] = 0;
-                    
-                        printf("Name of game [2]: ");
-                        fgets(name2, sizeof(name2), stdin);
-                        name2[strcspn(name2, "\n")] = 0;
-                    
-                        if (findGame(name1) && findGame(name2)) {
-                            addRelation(name1, name2, 1);  
-                    
-                            addRelation(name2, name1, 0);  
-                        } else {
-                            printf(" One or both games not found. Cannot add relation.\n");
-                        }
-                    
-                        printf("\nPress Enter to continue...");
+                        printf("\nPress Enter to continue and view the game list...");
+                        while (getchar() != '\n');
+                        CLEAR_SCREEN();
+                        printgamelist();
+                        printf("\nPress Enter to return to the Admin Menu...");
                         while (getchar() != '\n');
                         break;
                     
