@@ -82,8 +82,8 @@ void customerMenu(const char *username){
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
                 case 6:
-                     printf("\n--- Your Purchase History ---\n");
-                    display_user_logging(username);
+                    printf("\n--- Your Purchase History ---\n");
+                    display_user_History(username);
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
