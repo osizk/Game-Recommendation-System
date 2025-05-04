@@ -261,6 +261,7 @@ void deleteGame(char name[]) {
     printf("Game '%s' not found.\n", name);
 }
 
+// Add a relation between two games if not already related
 void addRelation(char name1[], char name2[], int writeToFile) {
     name1[strcspn(name1, "\n")] = 0;
     name2[strcspn(name2, "\n")] = 0;
@@ -268,17 +269,19 @@ void addRelation(char name1[], char name2[], int writeToFile) {
     game *game1 = findGame(name1);
     game *game2 = findGame(name2);
 
+    //when one game don't have in games.csv
     if (!game1 || !game2) {
         printf("game1 = %s game2 = %d\n",game1,game2);
         printf(" One or both games not found.\n");
         return;
     }
-
+    //when add same game name
     if (game1 == game2) {
         printf(" Cannot relate a game to itself.\n");
         return;
     }
 
+    // Check for existing relation
     for (int i = 0; i < game1->relationcount; ++i) {
         if (game1->related[i] == game2) {
             if (writeToFile) {
@@ -288,9 +291,12 @@ void addRelation(char name1[], char name2[], int writeToFile) {
         }
     }
 
+
+    // Add relation if under limit
     if (game1->relationcount < max_relation) {
         game1->related[game1->relationcount++] = game2;
 
+        // Save to CSV and log
         if (writeToFile) {
             FILE *fp = fopen("relations.csv", "a");
             if (fp != NULL) {
@@ -311,7 +317,7 @@ void addRelation(char name1[], char name2[], int writeToFile) {
 
 
 
-
+// Add a game to the end of the queue
 void enqueue(queue **front,queue **rear, game *game){
     queue *newnode = malloc(sizeof(queue));
     if (newnode == NULL) {
@@ -330,6 +336,7 @@ void enqueue(queue **front,queue **rear, game *game){
     }
 }
 
+// Remove and return a game from the front of the queue
 game* dequeue(queue **front, queue **rear) {
     if (*front == NULL) {
         return NULL;
@@ -345,6 +352,7 @@ game* dequeue(queue **front, queue **rear) {
     return result;
 }
 
+// Reset the visited flag of all games in the hash table
 void setVisited(){
     for (int i = 0; i < tablesize; i++) {
         game *current = hashIndex[i];
@@ -355,6 +363,7 @@ void setVisited(){
     }
 }
 
+//BFS relation of game name(input game name) Just for test
 void BFS(char name[]){
     game *Game = findGame(name);
     if (Game == NULL) {
@@ -390,6 +399,7 @@ void BFS(char name[]){
     }
 }
 
+// Clear all items from the cart and reset its state
 void setCart(){
     CartItem* current = cart.front;
     CartItem* next;
@@ -399,12 +409,14 @@ void setCart(){
         free(current);
         current = next;
     }
+    //Reset Cart Stage
     cart.front = NULL;
     cart.rear = NULL;
     cart.count = 0;
     cart.total = 0;
 }
 
+// Add a game to the shopping cart if it's not already in and cart is not full
 void addtoCart(char name[]){
     if(cart.count >= max_cart) {
         printf("Cart is full! Maximum %d items allowed.\n", max_cart);
@@ -415,6 +427,8 @@ void addtoCart(char name[]){
         printf("Game '%s' not found!\n", name);
         return;
     }
+
+     // Check for duplicates
     CartItem* current = cart.front;
     while (current != NULL) {
         if (compareWithoutspaces(current->game->name, name) == 0) {
@@ -424,9 +438,10 @@ void addtoCart(char name[]){
         current = current->next;
     }
 
+    // Allocate and append new cart item
     CartItem* newItem = malloc(sizeof(CartItem));
     if (newItem == NULL) {
-        printf("Memory allocation failed for cart item.\n");
+        printf("fail create new item");
         return;
     }
     newItem->game = found;
@@ -446,6 +461,7 @@ void addtoCart(char name[]){
     printf("Cart now has %d items (Total: $%.2f)\n", cart.count, cart.total);
 }
 
+// Remove a game from the cart by name
 void deletefromCart(char name[]){
     if(cart.count == 0) {
         printf("Cart is empty!\n");
@@ -454,8 +470,11 @@ void deletefromCart(char name[]){
     CartItem *current=cart.front;
     CartItem *prev=NULL;
     int found = 0;
+
+    // Traverse cart to find the game
     while(current!=NULL){
         if(!compareWithoutspaces(current->game->name,name)){
+            // Remove node from linked list
             if(prev==NULL){
                 cart.front=current->next;
             }else{
@@ -480,27 +499,35 @@ void deletefromCart(char name[]){
     }
 }
 
+// Display all games currently in the shopping cart
 void viewCart(){
+    // Clear the screen for clean output
     CLEAR_SCREEN();
+
+    // Head
     printf("\n+--------------------------------------------------------------+\n");
     printf("|                     Your Shopping Cart                       |\n");
     printf("+------------------------------+--------------------+----------+\n");
 
+    //if cart empty
     if(cart.count == 0) {
         printf("|Your cart is empty                                            |\n");
         printf("+--------------------------------------------------------------+\n");
         return;
     }
-
+    
+    //table head 
     printf("| %-28s | %-18s | %-8s |\n", "Game", "Genre", "Price");
     printf("+------------------------------+--------------------+----------+\n");
 
+    // Display each item in cart
     CartItem* current = cart.front;
     while(current != NULL) {
         printf("| %-28s | %-18s | %-8.2f |\n", current->game->name,current->game->genre,current->game->price);
         current = current->next;
     }
 
+    //Bottom with total Price
     printf("+------------------------------+--------------------+----------+\n");
     printf("|Total: $%-54.2f|\n", cart.total);
     printf("+--------------------------------------------------------------+\n\n");
