@@ -10,9 +10,9 @@
 #include "logging_system.h"
 
 #ifdef _WIN32
-#define CLEAR_SCREEN() system("cls")
+#define CLEAR_SCREEN() system("cls")//for window
 #else
-#define CLEAR_SCREEN() system("clear")
+#define CLEAR_SCREEN() system("clear")//for mac
 #endif
 
 void displayMainMenu() {
@@ -28,8 +28,8 @@ void displayMainMenu() {
 }
 
 int main() {
-    loadGame("games.csv");
-    loadRelations("relations.csv");
+    loadGame("games.csv"); //load game to hash table
+    loadRelations("relations.csv"); //load relation to graph
     int c;
     int choice;
     char username[100];
@@ -38,9 +38,9 @@ int main() {
         displayMainMenu();
         int input;
         scanf("%d",&input);
-        while ((c = getchar()) != '\n' && c != EOF);
+        while ((c = getchar()) != '\n' && c != EOF);//clear buffer from scanf
         switch (input) {
-            case 1:
+            case 1: //login
                 switch (login(username)) {
                     case 1:
                         customerMenu(username);
@@ -51,7 +51,7 @@ int main() {
                     case 3:
                         printf("\nInvalid username or password.\n");
                         printf("Press Enter to continue...");
-                        while ((c = getchar()) != '\n' && c != EOF);
+                        while ((c = getchar()) != '\n' && c != EOF);//wait for enter
                         break;
                     default:
                         printf("\nInvalid choice.\n");
@@ -59,12 +59,12 @@ int main() {
                         while ((c = getchar()) != '\n' && c != EOF);
                 }
                 break;
-            case 2: 
+            case 2: //register
                 user_register();
                 printf("Press Enter to continue...");
                 while ((c = getchar()) != '\n' && c != EOF);
                 break;
-            case 3:
+            case 3: //exit
                 printf("\nExiting program...\n");
                 return 0;
             default:

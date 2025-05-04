@@ -53,7 +53,7 @@ void addRelation(char name1[], char name2[], int writeToFile);
 void enqueue(queue **front,queue **rear, game *game);
 game* dequeue(queue **front,queue **rear);
 void setVisited();
-void BFS(char name[]); //not use
+void BFS(char name[]); //not use just for test
 void setCart();
 void addtoCart(char name[]);
 void deletefromCart(char name[]);

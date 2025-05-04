@@ -46,12 +46,12 @@ gcc main.c login.c logging_system.c game.c admin_interface.c customer_interface.
 
 
 
-## 📝 Sample Input and Output
+## Sample Input and Output
 
 ### Admin Login
 ```
-Enter admin username: admin1
-Enter admin password: 1234
+Enter admin username: admin
+Enter admin password: admin123
 ```
 **Output:**
 ```
@@ -74,8 +74,8 @@ Enter admin password: 1234
 **Sample Input:**
 ```
 [2] Customer Login
-Username: user1
-Password: userpass
+Username: user
+Password: user123
 ```
 
 **Output:**

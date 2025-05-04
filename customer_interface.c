@@ -13,13 +13,13 @@
 
 
 void customerMenu( char username[]){
-    setCart();
+    setCart();//set cart value to default
     int input;
     char name[100];
     int c;
     while(1){
         CLEAR_SCREEN();
-        printgamelist();
+        printgamelist();//display game list
         printf("\n+-----------------------------+\n");
         printf("|       Customer Menu         |\n");
         printf("+-----------------------------+\n");
@@ -40,11 +40,11 @@ void customerMenu( char username[]){
 
                 switch (input)
                 {
-                case 1:
+                case 1://Search game
                     printf("\n--- Search Game ---\n");
                     printf("Enter game to search: ");
                     fgets(name, sizeof(name), stdin);
-                    name[strcspn(name, "\n")] = '\0';
+                    name[strcspn(name, "\n")] = '\0'; //remove newline character
                     game *found = findGame(name);
                     if (found != NULL){
                         printf("\nFound: %s (%s, $%.2f)\n", found->name, found->genre, found->price);
@@ -54,7 +54,7 @@ void customerMenu( char username[]){
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
-                case 2:
+                case 2://Add
                     printf("\n--- Add to Cart ---\n");
                     printf("Enter game to add to cart: ");
                     fgets(name, sizeof(name), stdin);
@@ -63,7 +63,7 @@ void customerMenu( char username[]){
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
-                case 3:
+                case 3://delete
                     printf("\n--- Delete from Cart ---\n");
                     printf("Enter game to delete from cart: ");
                     fgets(name, sizeof(name), stdin);
@@ -72,28 +72,28 @@ void customerMenu( char username[]){
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
-                case 4:
+                case 4://view
                     viewCart();
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
-                case 5:
+                case 5://checkout
                     checkout(username);
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
-                case 6:
+                case 6://purchase history
                     printf("\n--- Your Purchase History ---\n");
                     printPurchaseHistory(username);
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
-                case 7:
+                case 7://recommend game
                     recommendBasedOnHistory(username);
                     printf("\nPress Enter to continue...");
                     while ((c = getchar()) != '\n' && c != EOF);
                     break;
-                case 8:
+                case 8://return
                     printf("\nReturning to main menu...\n");
                     while ((c = getchar()) != '\n' && c != EOF);
                     return;

@@ -23,26 +23,26 @@ int login(char *username){
     char input_pass[50];
     char line[256];
 
-    printf("Enter username: ");
+    printf("Enter username: ");//input username
     if (fgets(input_user, sizeof(input_user), stdin) == NULL) {
         printf("Error username.\n");
         return 0;
     }
     input_user[strcspn(input_user, "\n")] = 0;
 
-    printf("Enter password: ");
+    printf("Enter password: ");//input password
     if (fgets(input_pass, sizeof(input_pass), stdin) == NULL) {
         printf("Error password.\n");
         return 0;
     }
     input_pass[strcspn(input_pass, "\n")] = 0;
 
-    if(user_login(username,input_user,input_pass)){
+    if(user_login(username,input_user,input_pass)){//check user
         return 1;
-    }else if(admin_login(input_user,input_pass)){
+    }else if(admin_login(input_user,input_pass)){//check admin
         return 2;
     }else{
-        return 3;
+        return 3;//error
     }
 }
 
@@ -62,9 +62,11 @@ int user_login(char *username,char *input_user,char *input_pass) {
         char file_user[50];
         char file_pass[50];
         if (sscanf(line, "%[^,],%s", file_user, file_pass) == 2) {
+            //checking is username and password are match with user.csv
             if (strcmp(input_user, file_user) == 0 && strcmp(input_pass, file_pass) == 0) {
                 check = 1;
                 strcpy(username, input_user);
+                //logging
                 char event[100];
                 snprintf(event, sizeof(event), "User %s login", input_user);
                 logging_event(event, input_user);
@@ -93,8 +95,10 @@ int admin_login(char *input_user,char *input_pass) {
         char file_user[50];
         char file_pass[50];
         if (sscanf(line, "%[^,],%s", file_user, file_pass) == 2) {
+            //checking is username and password are match with admin.csv
             if (strcmp(input_user, file_user) == 0 && strcmp(input_pass, file_pass) == 0) {
                 check = 1;
+                //logging
                 char event[100];
                 snprintf(event, sizeof(event), "Admin %s login", input_user);
                 logging_event(event, input_user);
@@ -170,11 +174,11 @@ int user_register() {
         return 0;
     }
 
-    // Add new user to file
+    // Add newuser to file
     fprintf(file, "%s,%s\n", new_user, new_pass);
     fclose(file);
 
-    // Log the registration
+    // Logging
     char event[100];
     snprintf(event, sizeof(event), "New user registered: %s", new_user);
     logging_event(event, new_user);
