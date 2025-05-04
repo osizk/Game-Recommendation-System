@@ -1,170 +1,121 @@
-```markdown
-# Game Management System
+# Game Store Management System
 
-A simple command-line application written in C for managing a list of games. Supports both administrative users (adding, editing, deleting games) and regular customers (viewing the game list). Uses an in-memory hash table for game data, CSV files for persistence, and logs login events to a text file.
+This is a **C-based console application** that simulates a game store management system. It supports both **Admin** and **Customer** functionalities, including game management, cart and checkout system, and personalized game recommendations based on purchase history and related games.
 
----
 
-## Features
 
-### Admin Interface
-- **Secure login**  
-- **Add new games** (Name, Genre, Price)  
-- **Edit existing games** (modify genre & price by name)  
-- **Delete games** by name  
-- **View** a formatted list of all games  
+## Project Description
 
-### Customer Interface
-- **User login**  
-- **View** a formatted list of all games  
+This project consists of the following features:
 
-### Data Storage
-- **In-memory hash table** for fast lookups  
-- **Initial data loaded** from `games.csv`  
-- **Credentials** loaded from `admins.csv` & `users.csv`  
+### Admin Features:
+- Login with credentials (`admin.csv`)
+- Add/Edit/Delete games
+- Create relations between games (stored in `relations.csv`)
+- View system activity logs by date (`Logging/logging_YYYY-MM-DD.csv`)
 
-### Logging
-- Records admin and user login events in `logging.txt`
+### Customer Features:
+- Login with credentials (`users.csv`)
+- Search for games
+- Add to/Delete from cart
+- View cart and checkout
+- View purchase history
+- Get personalized game recommendations using **BFS** from previously bought games and genre matching
 
----
 
-## Prerequisites
 
-- A C compiler (e.g., GCC)  
-- Standard C libraries:  
-  - `<stdio.h>`  
-  - `<stdlib.h>`  
-  - `<string.h>`  
-  - `<ctype.h>`  
-  - `<time.h>`  
-  - `<strings.h>`
+## How to Run the Code
 
----
-
-## File Structure
-
-```
-.
-├── main.c                  # Entry point and main menu
-├── game.h                  # Game data structures & function declarations
-├── game.c                  # Hashing & game management functions
-├── login.h                 # Login function declarations
-├── login.c                 # Admin/user login implementations
-├── admin_interface.h       # Admin menu declaration
-├── admin_interface.c       # Admin menu & operations
-├── customer_interface.h    # Customer menu declaration
-├── customer_interface.c    # Customer menu implementation
-├── logging_system.h        # Logging function declarations
-├── logging_system.c        # Logging implementation
-├── admins.csv              # Admin credentials (username,password)
-├── users.csv               # User credentials (username,password)
-├── games.csv               # Initial game data (Name,Genre,Price)
-└── logging.txt             # Auto-generated login event logs
-```
-
----
-
-## Setup & Compilation
-
-1. **Save** all the `.c` and `.h` files in the same directory.  
-2. **Create** the CSV files in that directory:
-
-   - **admins.csv**  
-     ```csv
-     admin,password123
-     super_user,secure_pass
-     ```
-   - **users.csv**  
-     ```csv
-     user1,pass1
-     customer_A,my_pass
-     ```
-   - **games.csv**  
-     ```csv
-     Game A,Action,19.99
-     Game B,RPG,39.50
-     Game C,Puzzle,9.99
-     ```
-
-3. **Compile** using GCC:
-
-   ```bash
-   gcc main.c game.c admin_interface.c customer_interface.c login.c logging_system.c -o game_manager
-   ```
-   - `-o game_manager` specifies the output executable name (you can change it).
-
----
-
-## Running the Program
-
+### 1. Compile all files (assuming GCC):
 ```bash
-./game_manager
+gcc main.c game.c login.c admin_interface.c customer_interface.c logging_system.c -o gamestore
 ```
 
-_On Windows, run `game_manager.exe`._
+### 2. Make sure required folders/files exist:
+- `games.csv` – contains game list
+- `relations.csv` – game relations
+- `users.csv` – user credentials
+- `admin.csv` – admin credentials
+- Create a folder named `Logging` and `UserHistory` in the working directory.
 
-You will see:
-
-```
---- Main Menu ---
-[1] Admin
-[2] Customer
-[3] Exit
-Enter your choice:
-```
-
----
-
-## Usage
-
-### [1] Admin
-1. **Login** with admin credentials.  
-2. On success, you enter the **Admin Menu**, where the current game list is displayed automatically.
-3. Choose from:
-   1. **Add Game** — Enter name, genre, price.  
-   2. **Edit Game** — Modify genre & price by game name.  
-   3. **Delete Game** — Remove by name.  
-   4. **View All Games** — Re-display the formatted list.  
-   5. **Back to Main Menu**  
-
-### [2] Customer
-1. **Login** with user credentials.  
-2. On success, view the formatted list of all games.  
-
-### [3] Exit
-- Quit the application.
-
----
-
-## Managing Users & Admins
-
-- To **add** or **remove** admins/users, manually edit `admins.csv` or `users.csv`.  
-- Each line: `username,password`
-
----
-
-## Viewing Logs
-
-- All login events are appended to `logging.txt`.  
-- Open it with any text editor to review timestamps and usernames.
-
----
-
-## Extending the System
-
-- **Customer features**: search, purchase flow, ratings, etc.  
-- **Additional game fields**: release date, developer, rating.  
-- **Persistence**: save back to `games.csv` on exit.  
-- **Error handling**: detect missing/malformed CSV files.  
-- **Input validation**: ensure valid names, genres, prices.  
-- **Relationships**: use adjacency lists/matrices for game recommendations.
-
----
-
-## License
-
-(Optional: add your project’s license here.)
-
+### 3. Run:
+```bash
+gcc main.c login.c logging_system.c game.c admin_interface.c customer_interface.c -o run
+>> ./run
 ```
 
-Feel free to customize any section or add further details as your project evolves!
+
+
+## 📝 Sample Input and Output
+
+### Admin Login
+```
+Enter admin username: admin1
+Enter admin password: 1234
+```
+**Output:**
+```
++-----------------------------+
+|         Admin Menu          |
++-----------------------------+
+| [1] Add Game                |
+| [2] Edit Game               |
+| [3] Delete Game             |
+| [4] Watch Logging           |
+| [5] Add relation            |
+| [6] Back to Main Menu       |
++-----------------------------+
+```
+
+
+
+### Customer Menu Options
+
+**Sample Input:**
+```
+[2] Customer Login
+Username: user1
+Password: userpass
+```
+
+**Output:**
+```
++-----------------------------+
+|       Customer Menu         |
++-----------------------------+
+| [1] Search Games            |
+| [2] Add to Cart             |
+| [3] Delete from Cart        |
+| [4] View Cart               |
+| [5] Checkout                |
+| [6] View Purchase History   |
+| [7] Recommend Game          |
++-----------------------------+
+```
+
+
+
+### Sample Game Data (`games.csv`)
+```csv
+Name,Genre,Price
+Elden Ring,Action RPG,59.99
+Demon's Souls,Action RPG,49.99
+FIFA 23,Sports,39.99
+```
+
+
+
+### Sample Relation (`relations.csv`)
+```csv
+Elden Ring,Demon's Souls
+FIFA 23,NBA 2K23
+```
+
+
+
+### Sample Log Output (`Logging/logging_2025-04-28.csv`)
+```csv
+Date,Time,Activity,User
+2025-04-28,21:13:22,User user1 login,user1
+2025-04-28,21:14:02,Purchased Game: Elden Ring ($59.99),user1
+```
