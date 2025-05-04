@@ -129,7 +129,6 @@ void adminMenu() {
                         break;
 
                     case 5:
-                        //loadRelations("relations.csv");
                         printf("\n--- Add Relation Between Games ---\n");
                     
                         printf("Name of game [1]: ");

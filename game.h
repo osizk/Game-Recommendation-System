@@ -40,7 +40,6 @@ typedef struct UserPurchase {
 
 void saveGameToCSV(char filename[]);
 unsigned int hash(char name[]);
-void saveGameToCSV(char filename[]);
 void addGame(char name[], char genre[], float price);
 void loadGame(char filename[]);
 void loadRelations(char filename[]);

@@ -7,6 +7,12 @@
 #include "game.h"
 #include "logging_system.h"
 
+#ifdef _WIN32
+#define CLEAR_SCREEN() system("cls")
+#else
+#define CLEAR_SCREEN() system("clear")
+#endif
+
 game *hashIndex[tablesize] = {NULL};
 UserPurchase* currentUserPurchase = NULL;
 Cart cart;
@@ -464,7 +470,7 @@ void deletefromCart(char name[]){
 }
 
 void viewCart(){
-    system("cls");
+    CLEAR_SCREEN();
     printf("\n+--------------------------------------------------------------+\n");
     printf("|                     Your Shopping Cart                       |\n");
     printf("+------------------------------+--------------------+----------+\n");
@@ -650,7 +656,7 @@ void recordPurchase(const char* username, Cart* cart) {
 }
 
 void recommendBasedOnHistory(const char* username) {
-    system("cls");
+    CLEAR_SCREEN();
     if (currentUserPurchase == NULL || strcmp(currentUserPurchase->username, username) != 0) {
         loadUserPurchaseHistory(username);
     }
@@ -780,7 +786,7 @@ void recommendBasedOnHistory(const char* username) {
 }
 
 void printPurchaseHistory(const char* username) {
-    system("cls");
+    CLEAR_SCREEN();
     char filename[150];
     snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
     
