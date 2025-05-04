@@ -1,11 +1,15 @@
 #include "logging_system.h"
 #include <stdio.h>
 #include <time.h>
-#include <string.h> // Include for strcspn if needed for string manipulation
+#include <string.h>
 #define LOG_FOLDER "Logging"
 
+
+// Constructs the log filename based on the given date and stores it in 'filename'.
+// The result will be something like "Logging/logging_2025-04-28.csv"
 void CreateLogbyDate(char *filename, size_t size, const char *date)
-{  
+{
+    // Format: Logging/logging_<date>.csv  
     snprintf(filename, size, LOG_FOLDER"/logging_%s.csv", date);
 }
 
@@ -62,34 +66,48 @@ void logging_event(const char *event, const char *user)
     fclose(fp);
 }
 
-
+//function Display Logging
 void display_logging(const char *date)
 {
+
+    // Construct the log file path based on the provided date
     char filename[256];
     CreateLogbyDate(filename, sizeof(filename), date);  
 
+    // Open the log file for reading
     FILE *fp = fopen(filename, "r");
     if (fp == NULL)
     {
         printf("Can't open file: %s\n", filename);
         return;
     }
-
+    // Print head of logging
     char line[512];
     printf("+-----------------------------------------------------------------------------------+\n");
     printf("|                             System Logging: %s                            |\n", date);
     printf("|----------+-------------------------------------------------------------+----------|\n");
     printf("|%-10s|%-61s|%-10s|\n", "Time", "Activity", "User");
     printf("|----------+-------------------------------------------------------------+----------|\n");
+
+    // Skip the CSV head line
     fgets(line, sizeof(line), fp);
+
+    // Read and parse each log line
     while (fgets(line, sizeof(line), fp))
     {
         char tempdate[10], time[10],activity[100], user[20];
         
+        // Parse the CSV line into individual fields
         if (sscanf(line, "%[^,],%[^,],%[^,],%s",tempdate, time, activity, user) == 4) {
+
+            // Display the parsed log entry in table format
             printf("|%-10s|%-61s|%-10s|\n", time, activity, user);
         }
     }
+
+    // Print closing table border
     printf("+-----------------------------------------------------------------------------------+\n");
+
+    // Close the file
     fclose(fp);
 }
