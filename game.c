@@ -130,12 +130,10 @@ void loadRelations(char filename[]) {
         char game1_name[100], game2_name[100];
         if (sscanf(line, "%[^,],%[^\n]", game1_name, game2_name) == 2) {
             addRelation(game1_name, game2_name,0);
-        } else {
-            printf("⚠️ Skipping malformed line: %s", line);
+            addRelation(game2_name, game1_name,0);
         }
     }
     fclose(file);
-    printf(" Game relations loaded from '%s'.\n", filename);
 }
 void printgamelist() {
     printf("\n+--------------------------------------------------------------+\n");
@@ -255,6 +253,7 @@ void addRelation(char name1[], char name2[], int writeToFile) {
     game *game2 = findGame(name2);
 
     if (!game1 || !game2) {
+        printf("game1 = %s game2 = %d\n",game1,game2);
         printf(" One or both games not found.\n");
         return;
     }
@@ -267,7 +266,7 @@ void addRelation(char name1[], char name2[], int writeToFile) {
     for (int i = 0; i < game1->relationcount; ++i) {
         if (game1->related[i] == game2) {
             if (writeToFile) {
-                printf("⚠️ Relation already exists: %s <-> %s\n", name1, name2);
+                printf("Relation already exists: %s <-> %s\n", name1, name2);
             }
             return;
         }
@@ -287,10 +286,10 @@ void addRelation(char name1[], char name2[], int writeToFile) {
             snprintf(logMsg, sizeof(logMsg), "Relation added: %s <-> %s", name1, name2);
             logging_event(logMsg, "Admin");
 
-            printf("✅ Relation added: %s <-> %s\n", name1, name2);
+            printf("Relation added: %s <-> %s\n", name1, name2);
         }
     } else {
-        printf("⚠️ Max relation reached for '%s'\n", name1);
+        printf("Max relation reached for '%s'\n", name1);
     }
 }
 

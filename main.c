@@ -20,8 +20,8 @@ void displayMainMenu() {
     printf("\n+-----------------------------+\n");
     printf("|      Game System Menu       |\n");
     printf("+-----------------------------+\n");
-    printf("| [1] Admin Login             |\n");
-    printf("| [2] Customer Login          |\n");
+    printf("| [1] Login                   |\n");
+    printf("| [2] Register                |\n");
     printf("| [3] Exit                    |\n");
     printf("+-----------------------------+\n");
     printf("Enter your choice: ");
@@ -33,53 +33,46 @@ int main() {
     int c;
     int choice;
     char username[100];
-    
+
     while (1) {
         displayMainMenu();
-        char input_str[10];
-        if (fgets(input_str, sizeof(input_str), stdin) != NULL) {
-            if (sscanf(input_str, "%d", &choice) == 1) {
-                switch (choice) {
+        int input;
+        scanf("%d",&input);
+        while ((c = getchar()) != '\n' && c != EOF);
+        switch (input) {
+            case 1:
+                switch (login(username)) {
                     case 1:
-                        if (admin_login()) {
-                            adminMenu();
-                        } else {
-                            printf("\nlogin failed.\n");
-                            printf("Press Enter to continue...");
-                            while ((c = getchar()) != '\n' && c != EOF);
-                        }
+                        customerMenu(username);
                         break;
-                    case 2: {
-                        int c3;
-                        while ((c3 = getchar()) != '\n' && c3 != EOF);
-                        if (user_login(username)) {
-                            customerMenu(username);
-                        } else {
-                            printf("\nlogin failed.\n");
-                            printf("Press Enter to continue...");
-                            while ((c = getchar()) != '\n' && c != EOF);
-                        }
+                    case 2: 
+                        adminMenu();
                         break;
-                    }
                     case 3:
-                        printf("\nExiting Game System. Goodbye!\n");
-                        return 0;
+                        printf("\nInvalid username or password.\n");
+                        printf("Press Enter to continue...");
+                        while ((c = getchar()) != '\n' && c != EOF);
+                        break;
                     default:
-                        printf("\nInvalid choice. Please enter a number between 1 and 3.\n");
+                        printf("\nInvalid choice.\n");
                         printf("Press Enter to continue...");
                         while ((c = getchar()) != '\n' && c != EOF);
                 }
-            } else {
-                printf("\nInvalid input. Please enter a number.\n");
+                break;
+            case 2: 
+                user_register();
                 printf("Press Enter to continue...");
-                int c;
                 while ((c = getchar()) != '\n' && c != EOF);
-            }
-        } else {
-            printf("\nError reading input. Exiting.\n");
-            return 1;
+                break;
+            case 3:
+                printf("\nExiting program...\n");
+                return 0;
+            default:
+                printf("\nInvalid choice.\n");
+                printf("Press Enter to continue...");
+                while ((c = getchar()) != '\n' && c != EOF);
         }
+                
     }
-
     return 0;
 }

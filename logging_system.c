@@ -76,12 +76,20 @@ void display_logging(const char *date)
     }
 
     char line[512];
-    printf("\n---- System Logging: %s ----\n", date);
-    while (fgets(line, sizeof(line), fp) != NULL)
+    printf("+-----------------------------------------------------------------------------------+\n");
+    printf("|                             System Logging: %s                            |\n", date);
+    printf("|----------+-------------------------------------------------------------+----------|\n");
+    printf("|%-10s|%-61s|%-10s|\n", "Time", "Activity", "User");
+    printf("|----------+-------------------------------------------------------------+----------|\n");
+    fgets(line, sizeof(line), fp);
+    while (fgets(line, sizeof(line), fp))
     {
-        printf("%s", line);
+        char tempdate[10], time[10],activity[100], user[20];
+        
+        if (sscanf(line, "%[^,],%[^,],%[^,],%s",tempdate, time, activity, user) == 4) {
+            printf("|%-10s|%-61s|%-10s|\n", time, activity, user);
+        }
     }
-    printf("---- End of System Logging ----\n\n");
-
+    printf("+-----------------------------------------------------------------------------------+\n");
     fclose(fp);
 }

@@ -20,6 +20,7 @@ void adminMenu() {
     char newGenre[99];
     float newPrice;
     char name1[99],name2[99];
+    int c;
 
     while (1) {
         CLEAR_SCREEN();
@@ -57,7 +58,8 @@ void adminMenu() {
                         if (sscanf(price_str, "%f", &price) != 1) {
                             printf("Invalid price entered. Please enter a number.\n");
                             printf("\nPress Enter to continue...");
-                            while (getchar() != '\n');
+                            //while (getchar() != '\n');
+                            while ((c = getchar()) != '\n' && c != EOF);
                             break;
                         }
 
@@ -85,7 +87,8 @@ void adminMenu() {
                             if (sscanf(new_price_str, "%f", &newPrice) != 1) {
                                 printf("Invalid new price entered.\n");
                                 printf("\nPress Enter to continue...");
-                                while (getchar() != '\n');
+                                //while (getchar() != '\n');
+                                while ((c = getchar()) != '\n' && c != EOF);
                                 break;
                             }
 
@@ -95,7 +98,8 @@ void adminMenu() {
                         }
 
                         printf("\nPress Enter to continue...");
-                        while (getchar() != '\n');
+                        //while (getchar() != '\n');
+                        while ((c = getchar()) != '\n' && c != EOF);
                         break;
 
                     case 3:
@@ -111,7 +115,8 @@ void adminMenu() {
                         }
 
                         printf("\nPress Enter to continue...");
-                        while (getchar() != '\n');
+                        //while (getchar() != '\n');
+                        while ((c = getchar()) != '\n' && c != EOF);
                         break;
 
                     case 4:
@@ -124,10 +129,12 @@ void adminMenu() {
                         display_logging(date);
                         printf("Press Enter to continue...");
                         getchar();                
-                        while (getchar() != '\n');  
+                        //while (getchar() != '\n');  
+                        while ((c = getchar()) != '\n' && c != EOF);
                         break;
 
-                        case 5:
+                    case 5:
+                        loadRelations("relations.csv");
                         printf("\n--- Add Relation Between Games ---\n");
                     
                         printf("Name of game [1]: ");
@@ -146,23 +153,27 @@ void adminMenu() {
                         }
                     
                         printf("\nPress Enter to continue...");
-                        while (getchar() != '\n');
+                        //while (getchar() != '\n');
+                        while ((c = getchar()) != '\n' && c != EOF);
                         break;
                     
                     case 6:
                         printf("\nReturning to main menu...\n");
-                        while (getchar() != '\n');
+                        //while (getchar() != '\n');
+                        while ((c = getchar()) != '\n' && c != EOF);
                         return;
 
                     default:
                         printf("\nInvalid choice. Please try again.\n");
                         printf("\nPress Enter to continue...");
-                        while (getchar() != '\n');
+                        //while (getchar() != '\n');
+                        while ((c = getchar()) != '\n' && c != EOF);
                 }
             } else {
                 printf("\nInvalid input. Please enter a number.\n");
                 printf("\nPress Enter to continue...");
-                while (getchar() != '\n');
+                //while (getchar() != '\n');
+                while ((c = getchar()) != '\n' && c != EOF);
             }
         } else {
             printf("\nError reading input. Returning to main menu.\n");
