@@ -10,4 +10,4 @@ void logging_event(const char *event, const char *user);
 void display_logging(const char *date);
 
 
-#endif // LOGGING_SYSTEM_H
+#endif
