@@ -12,6 +12,7 @@
 #define CLEAR_SCREEN() system("clear")
 #endif
 
+//admin menu fuction//
 void adminMenu() {
     int choice;
     char name[99];
@@ -24,8 +25,9 @@ void adminMenu() {
 
     while (1) {
         CLEAR_SCREEN();
-        printgamelist();
+        printgamelist(); //display list game
 
+        //print admin menu option
         printf("+-----------------------------+\n");
         printf("|         Admin Menu          |\n");
         printf("+-----------------------------+\n");
@@ -38,16 +40,18 @@ void adminMenu() {
         printf("+-----------------------------+\n");
         printf("Enter your choice: ");
 
+        //read a choice
         char input_str[10];
-        if (fgets(input_str, sizeof(input_str), stdin) != NULL) {
+        if (fgets(input_str, sizeof(input_str), stdin) != NULL)
+        {
             if (sscanf(input_str, "%d", &choice) == 1) {
                 switch (choice) {
                     case 1:
+                        //choice for add new game
                         printf("\n--- Add New Game ---\n");
                         printf("Enter game name: ");
-                        fgets(name, sizeof(name), stdin);
+                        fgets(name, sizeof(name), stdin); //read game name
                         name[strcspn(name, "\n")] = 0;
-
                         printf("Enter game genre: ");
                         fgets(genre, sizeof(genre), stdin);
                         genre[strcspn(genre, "\n")] = 0;
@@ -62,13 +66,14 @@ void adminMenu() {
                             break;
                         }
 
-                        addGame(name, genre, price);
+                        addGame(name, genre, price); // call fuction to addgame
                         char addGameLog[100];
                         snprintf(addGameLog, sizeof(addGameLog), "Add %s", name);
                         logging_event(addGameLog, "Admin");
                         break;
 
                     case 2:
+                        //choice for edit game list and detail
                         printf("\n--- Edit Existing Game ---\n");
                         printf("Enter the name of the game to edit: ");
                         fgets(name, sizeof(name), stdin);
@@ -90,7 +95,7 @@ void adminMenu() {
                                 break;
                             }
 
-                            editGame(name, newGenre, newPrice);
+                            editGame(name, newGenre, newPrice); // can function to edit game
                         } else {
                             printf("Game '%s' not found.\n", name);
                         }
@@ -100,13 +105,14 @@ void adminMenu() {
                         break;
 
                     case 3:
+                        //choice for delte game in store
                         printf("\n--- Delete Game ---\n");
                         printf("Enter the name of the game to delete: ");
                         fgets(name, sizeof(name), stdin);
                         name[strcspn(name, "\n")] = 0;
 
                         if (findGame(name)) {
-                            deleteGame(name);
+                            deleteGame(name); // call fuction to delete game
                         } else {
                             printf("Game '%s' not found.\n", name);
                         }
@@ -116,6 +122,7 @@ void adminMenu() {
                         break;
 
                     case 4:
+                        //choice for watch loggig
                         printf("\n--- Watch System Logging ---\n");
                         char date[11];
                         printf("Select Date (format: YYYY-MM-DD): ");
@@ -129,6 +136,7 @@ void adminMenu() {
                         break;
 
                     case 5:
+                        //choice for add relation between a game
                         printf("\n--- Add Relation Between Games ---\n");
                     
                         printf("Name of game [1]: ");
@@ -151,6 +159,7 @@ void adminMenu() {
                         break;
                     
                     case 6:
+                        //choice to back to main menu
                         printf("\nReturning to main menu...\n");
                         while ((c = getchar()) != '\n' && c != EOF);
                         return;
@@ -160,13 +169,15 @@ void adminMenu() {
                         printf("\nPress Enter to continue...");
                         while ((c = getchar()) != '\n' && c != EOF);
                 }
-            } else {
+            } 
+            else 
+            {
                 printf("\nInvalid input. Please enter a number.\n");
                 printf("\nPress Enter to continue...");
                 while ((c = getchar()) != '\n' && c != EOF);
             }
-        } else {
-            printf("\nError reading input. Returning to main menu.\n");
+        } 
+        else {printf("\nError reading input. Returning to main menu.\n");
             return;
         }
     }

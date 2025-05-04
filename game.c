@@ -26,7 +26,7 @@ unsigned int hash(char name[]) {
     }
     return hash_value % tablesize;
 }
-
+// function to save the current game list from the hash table
 void saveGameToCSV(char filename[]) {
     FILE* file = fopen(filename, "w");
     if (file == NULL) {
@@ -48,7 +48,7 @@ void saveGameToCSV(char filename[]) {
     printf("Game list saved to '%s'.\n", filename);
 }
 
-
+// function add game to hash table
 void addGame(char name[], char genre[], float price) {
     unsigned int index = hash(name);
     game *newNode = malloc(sizeof(game));
@@ -66,15 +66,16 @@ void addGame(char name[], char genre[], float price) {
     if (hashIndex[index] == NULL) {
         hashIndex[index] = newNode;
     } else {
+        // traverse to the end of the linked list
         game *current = hashIndex[index];
         while (current->next != NULL) {
             current = current->next;
         }
-        current->next = newNode;
+        current->next = newNode; // add the new node at the end of the list
     }
     printf("Game '%s' added successfully.\n", name);
 
-    saveGameToCSV("games.csv");
+    saveGameToCSV("games.csv"); //call saveGameTOCSV to write game to games.csv file
 }
 
 
@@ -141,6 +142,8 @@ void loadRelations(char filename[]) {
     }
     fclose(file);
 }
+
+// function to print the list games in the hash table.
 void printgamelist() {
     printf("\n+--------------------------------------------------------------+\n");
     printf("|                         Game List                            |\n");
@@ -149,17 +152,17 @@ void printgamelist() {
     printf("| %-28s | %-18s | %-8s |\n", "Name", "Genre", "Price");
     printf("+------------------------------+--------------------+----------+\n");
 
-    int game_count = 0;
+    int count = 0;
     for (int i = 0; i < tablesize; ++i) {
         game *temp = hashIndex[i];
         while (temp != NULL) {
             printf("| %-28s | %-18s | %-8.2f |\n", temp->name, temp->genre, temp->price);
             temp = temp->next;
-            game_count++;
+            count++;
         }
     }
 
-    if (game_count == 0) {
+    if (count == 0) {
         printf("| %-64s |\n", "No games found in the system.");
          printf("+--------------------------------------------------+\n\n");
     } else {
@@ -202,8 +205,9 @@ game *findGame(char name[]) {
     return NULL;
 }
 
+// fuction to edit game as genre and price
 void editGame(char name[], char newGenre[], float newPrice) {
-    game *gameToEdit = findGame(name);
+    game *gameToEdit = findGame(name); // find the game by name
 
     if (gameToEdit != NULL) {
         strcpy(gameToEdit->genre, newGenre);
@@ -213,12 +217,14 @@ void editGame(char name[], char newGenre[], float newPrice) {
         snprintf(editGame, sizeof(editGame), "Edit %s", name);
         logging_event(editGame,"Admin");
 
-        saveGameToCSV("games.csv");
+        saveGameToCSV("games.csv"); //call fuction saveGameTOCSV to save 
 
     } else {
         printf("Game '%s' not found.\n", name);
     }
 }
+
+// fuction to delete game in hash table
 void deleteGame(char name[]) {
     unsigned int index = hash(name);
     game *current = hashIndex[index];
@@ -241,7 +247,7 @@ void deleteGame(char name[]) {
             snprintf(deleteGame, sizeof(deleteGame), "Delete %s", name);
             logging_event(deleteGame,"Admin");
 
-            saveGameToCSV("games.csv");
+            saveGameToCSV("games.csv"); //call fuction saveGameTOCSV to save 
 
             return;
         }
