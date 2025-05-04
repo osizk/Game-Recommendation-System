@@ -533,18 +533,20 @@ void viewCart(){
     printf("+--------------------------------------------------------------+\n\n");
 }
 
+//checkout function
 void checkout(const char *username){
+    //check, Is cart empty
     if(cart.count == 0) {
         printf("Your cart is empty!\n");
         return;
     }
     printf("\n---- Cart Summary ----\n");
-    viewCart();
+    viewCart();//Display cart
     printf("\nConfirm purchase (y/n): ");
     char confirm_str[10];
     fgets(confirm_str, sizeof(confirm_str), stdin);
     char confirm = tolower(confirm_str[0]);
-
+    //check what user type
     if(confirm == 'y') {
         printf("\nPurchase completed! Thank you!\n");
         printf("Total charged: $%.2f\n", cart.total);
@@ -566,20 +568,23 @@ void checkout(const char *username){
     }
 }
 
+// Load user's purchase history from games.csv
 void loadUserPurchaseHistory(const char* username) {
     char filename[150];
     snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
 
+    // Free purchase history
     if (currentUserPurchase != NULL) {
         free(currentUserPurchase);
         currentUserPurchase = NULL;
     }
 
     FILE* file = fopen(filename, "r");
+    //check if the file doesn't exist
     if (!file) {
         currentUserPurchase = malloc(sizeof(UserPurchase));
         if (currentUserPurchase == NULL) {
-             printf("Memory allocation failed for user purchase history.\n");
+             printf("currentUserPurchase malloc failed.\n");
              return;
         }
         strcpy(currentUserPurchase->username, username);
@@ -597,31 +602,32 @@ void loadUserPurchaseHistory(const char* username) {
     currentUserPurchase->purchaseCount = 0;
 
     char line[256];
-    fgets(line, sizeof(line), file);
+    fgets(line, sizeof(line), file);//skip first line
 
+    // Read each line
     while (fgets(line, sizeof(line), file) && currentUserPurchase->purchaseCount < max_cart) {
         char name[100], genre[100], date[20];
         float price;
 
-        if (sscanf(line, "\"%[^\"]\",\"%[^\"]\",%f,%19s",
-                  name, genre, &price, date) == 4) {
+        if (sscanf(line, "\"%[^\"]\",\"%[^\"]\",%f,%19s",name, genre, &price, date) == 4) {
 
             game* purchasedGame = findGame(name);
             if (purchasedGame) {
+                // If the game is found, add it to the user's purchasedGames graph[array]
                 currentUserPurchase->purchasedGames[currentUserPurchase->purchaseCount] = purchasedGame;
                 currentUserPurchase->purchaseCount++;
             } else {
-                 printf("Warning: Purchased game '%s' not found in current game list.\n", name);
+                 printf("Purchased game '%s' not found in current game list.\n", name);
             }
-        } else {
-             printf("Warning: Skipping malformed purchase history line for user %s: %s", username, line);
         }
     }
 
     fclose(file);
 }
 
+// Save current user's purchase history to a CSV file.
 void saveUserPurchaseHistory(const char* username) {
+    // If there's no history or history is empty, remove history file if it exist
     if (!currentUserPurchase || currentUserPurchase->purchaseCount == 0) {
          char filename[100];
          snprintf(filename, sizeof(filename), "UserHistory/%s.csv", username);
@@ -641,6 +647,7 @@ void saveUserPurchaseHistory(const char* username) {
 
     fprintf(newFile, "\"Game\",\"Genre\",\"Price\",\"PurchaseDate\"\n");
 
+    // Get the current date
     time_t now = time(NULL);
     struct tm* tm_info = localtime(&now);
     char date_str[20];
@@ -662,17 +669,18 @@ void saveUserPurchaseHistory(const char* username) {
     rename("temp_history.csv", filename);
 }
 
-
+// record games from the current cart into user's purchase history
 void recordPurchase(const char* username, Cart* cart) {
-    if (!currentUserPurchase) {
-        currentUserPurchase = malloc(sizeof(UserPurchase));
-        strcpy(currentUserPurchase->username, username);
-        currentUserPurchase->purchaseCount = 0;
+    // If currentUserPurchase is NULL or doesn't match the current user, load the history
+    if (!currentUserPurchase || strcmp(currentUserPurchase->username, username) != 0) {
+        loadUserPurchaseHistory(username);
     }
-    loadUserPurchaseHistory(username);
+
     CartItem* item = cart->front;
+    //loop all item in cart
     while (item != NULL && currentUserPurchase->purchaseCount < max_cart) {
         int alreadyPurchased = 0;
+        // If game is already in the user's purchase history
         for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
             if (currentUserPurchase->purchasedGames[i] != NULL &&
                 compareWithoutspaces(currentUserPurchase->purchasedGames[i]->name, item->game->name) == 0) {
@@ -680,7 +688,7 @@ void recordPurchase(const char* username, Cart* cart) {
                 break;
             }
         }
-
+        // If the game is not already in the history, add it
         if (!alreadyPurchased) {
             currentUserPurchase->purchasedGames[currentUserPurchase->purchaseCount] = item->game;
             currentUserPurchase->purchaseCount++;
@@ -688,22 +696,26 @@ void recordPurchase(const char* username, Cart* cart) {
 
         item = item->next;
     }
-     if (cart->count > 0 && currentUserPurchase->purchaseCount >= max_cart) {
+    //check if history is full
+    if (cart->count > 0 && currentUserPurchase->purchaseCount >= max_cart) {
         printf("Purchase history is full.\n");
     }
 }
-
+// Recommend games based on the user's purchase history and game relations
 void recommendBasedOnHistory(const char* username) {
     CLEAR_SCREEN();
+    // Load user purchase history if it not already loaded for this user
     if (currentUserPurchase == NULL || strcmp(currentUserPurchase->username, username) != 0) {
         loadUserPurchaseHistory(username);
     }
+    // If user has no purchase history, show a message and return
     if (currentUserPurchase->purchaseCount == 0) {
         printf("No recommendation now. Try to buy some games.\n");
         return;
     }
-    setVisited();
+    setVisited();// Reset visited flags for BFS
     
+    // Struct for genre frequency
     typedef struct {
         char genre[99];
         int count;
@@ -711,10 +723,11 @@ void recommendBasedOnHistory(const char* username) {
     
     GenreFrequency genreFreq[20] = {0};
     int genreCount = 0;
-    
+
+    // find genre frequency
     for (int i = 0; i < currentUserPurchase->purchaseCount; i++) {
-        // find genre frequency
         int found = 0;
+        // Find if the genre is already in the frequency list
         for (int j = 0; j < genreCount; j++) {
             if (strcmp(genreFreq[j].genre, currentUserPurchase->purchasedGames[i]->genre) == 0) {
                 genreFreq[j].count++;
@@ -722,6 +735,7 @@ void recommendBasedOnHistory(const char* username) {
                 break;
             }
         }
+        // If the genre is not found add it
         if (!found && genreCount < 20) {
             strcpy(genreFreq[genreCount].genre, currentUserPurchase->purchasedGames[i]->genre);
             genreFreq[genreCount].count = 1;
@@ -751,6 +765,7 @@ void recommendBasedOnHistory(const char* username) {
         enqueue(&front, &rear, purchased);
     }
     
+    // Struct for recommendations with distance and score
     typedef struct {
         game* game;
         int distance;
@@ -773,7 +788,7 @@ void recommendBasedOnHistory(const char* username) {
                     break;
                 }
             }
-            
+
             recommendations[recCount].game = current;
             recommendations[recCount].distance = currentDistance;
             recommendations[recCount].genreScore = genreScore;
@@ -823,6 +838,7 @@ void recommendBasedOnHistory(const char* username) {
     logging_event(logMessage, username);
 }
 
+//Display user's purchase history
 void printPurchaseHistory(const char* username) {
     CLEAR_SCREEN();
     char filename[150];
@@ -840,11 +856,12 @@ void printPurchaseHistory(const char* username) {
     printf("+------------------------------+--------------------+----------+------------+\n");
 
     char line[256];
-    fgets(line, sizeof(line), file);
+    fgets(line, sizeof(line), file);//skip first line
     
     float totalSpent = 0.0f;
     int purchaseCount = 0;
 
+    // Read each line
     while (fgets(line, sizeof(line), file)) {
         char name[100], genre[100], date[20];
         float price;

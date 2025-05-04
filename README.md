@@ -40,8 +40,7 @@ gcc main.c game.c login.c admin_interface.c customer_interface.c logging_system.
 
 ### 3. Run:
 ```bash
-gcc main.c login.c logging_system.c game.c admin_interface.c customer_interface.c -o run
->> ./run
+./run
 ```
 
 
