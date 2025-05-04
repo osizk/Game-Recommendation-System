@@ -17,9 +17,10 @@ game *hashIndex[tablesize] = {NULL};
 UserPurchase* currentUserPurchase = NULL;
 Cart cart;
 
+//change string to index for hash table
 unsigned int hash(char name[]) {
     unsigned int hash_value = 0;
-    removeSpaces(name);
+    removeSpaces(name);//remove space before calculate index
     while (*name) {
         hash_value = (hash_value * 21) + tolower(*name);
         name++;
@@ -54,7 +55,7 @@ void addGame(char name[], char genre[], float price) {
     game *newNode = malloc(sizeof(game));
 
     if (newNode == NULL) {
-        printf("Memory allocation failed for new game node.\n");
+        printf("Failed create new game node.\n");
         return;
     }
     strcpy(newNode->name, name);
@@ -78,7 +79,7 @@ void addGame(char name[], char genre[], float price) {
     saveGameToCSV("games.csv"); //call saveGameTOCSV to write game to games.csv file
 }
 
-
+//load game to hash table
 void loadGame(char filename[]) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -86,19 +87,20 @@ void loadGame(char filename[]) {
         return;
     }
     char line[256];
-    fgets(line, sizeof(line), file);
+    fgets(line, sizeof(line), file);//skip first line
 
+    //Read each line
     while (fgets(line, sizeof(line), file)) {
         char name[99];
         char genre[99];
         float price;
-
+        //hash
         if (sscanf(line, "%[^,],%[^,],%f", name, genre, &price) == 3) {
             unsigned int index = hash(name);
             game *newNode = malloc(sizeof(game));
 
             if (newNode == NULL) {
-                printf("Memory allocation failed during loading.\n");
+                printf("Failed loading.\n");
                 continue;
             }
             strcpy(newNode->name, name);
@@ -116,8 +118,6 @@ void loadGame(char filename[]) {
                 }
                 current->next = newNode;
             }
-        } else {
-            printf("Skipping malformed line in %s: %s", filename, line);
         }
     }
 
@@ -125,6 +125,7 @@ void loadGame(char filename[]) {
     printf("Game data loaded from '%s'.\n", filename);
 }
 
+//load relation to graph
 void loadRelations(char filename[]) {
     FILE* file = fopen(filename, "r");
     if (!file) {
@@ -170,6 +171,7 @@ void printgamelist() {
     }
 }
 
+//remove space from string
 void removeSpaces(char str[])
 {
     int index = 0;
@@ -182,6 +184,7 @@ void removeSpaces(char str[])
     str[index] = '\0';
 }
 
+//compare 2 string without space and without sensitive case
 int compareWithoutspaces(char name1[], char name2[]) {
     char temp1[100];
     char temp2[100];
@@ -192,6 +195,7 @@ int compareWithoutspaces(char name1[], char name2[]) {
     return strcasecmp(temp1, temp2);
 }
 
+//return game that same name as string that sent to this function
 game *findGame(char name[]) {
     unsigned int index = hash(name);
     game *current = hashIndex[index];
@@ -389,6 +393,7 @@ void BFS(char name[]){
 void setCart(){
     CartItem* current = cart.front;
     CartItem* next;
+    //clear memory
     while (current != NULL) {
         next = current->next;
         free(current);
