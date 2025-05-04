@@ -5,6 +5,7 @@
 #define max_relation 100
 #define max_cart 100
 
+//game structure
 typedef struct game{
     char name[99];
     char genre[99];
@@ -15,23 +16,27 @@ typedef struct game{
     int visited;
 }game;
 
+//queue structure
 typedef struct queue{
     struct game *game;
     struct queue *next;
 }queue;
 
+//item structure
 typedef struct CartItem {
     game* game;
     struct CartItem* next;
 } CartItem;
 
-typedef struct {
+//linked list for item in cart
+typedef struct Cart{
     CartItem* front;
     CartItem* rear;
     int count;
     float total;
 } Cart;
 
+//UserPurchase structure
 typedef struct UserPurchase {
     char username[100];
     game* purchasedGames[max_cart];
