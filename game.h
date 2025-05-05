@@ -28,7 +28,7 @@ typedef struct CartItem {
     struct CartItem* next;
 } CartItem;
 
-//linked list for item in cart
+//Required values ​​for item linked list
 typedef struct Cart{
     CartItem* front;
     CartItem* rear;
