@@ -28,7 +28,7 @@ This project consists of the following features:
 
 ### 1. Compile all files (assuming GCC):
 ```bash
-gcc main.c game.c login.c admin_interface.c customer_interface.c logging_system.c -o gamestore
+gcc main.c game.c login.c admin_interface.c customer_interface.c logging_system.c -o run
 ```
 
 ### 2. Make sure required folders/files exist:
